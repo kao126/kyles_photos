@@ -1,37 +1,21 @@
-'use clients';
-import { auth, signIn, signOut } from '@/auth';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import { LoginForm } from '@/components/login-form';
 
 export default async function Login() {
   const session = await auth();
 
-  // console.log(session?.idToken);
+  if (session) {
+    redirect('/');
+  }
+
   return (
-    <div>
-      <h1>Login</h1>
-      <p>ログイン画面</p>
-      {!session && (
-        <form
-          action={async () => {
-            'use server';
-            await signIn('google');
-          }}
-        >
-          <button type='submit'>Signin with Google</button>
-        </form>
-      )}
-      {session && (
-        <div>
-          <p>success!!! welcome kyle's photos</p>
-          <form
-            action={async () => {
-              'use server';
-              await signOut();
-            }}
-          >
-            <button type='submit'>SignOut</button>
-          </form>
+    !session && (
+      <div className='flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10'>
+        <div className='flex w-full max-w-sm flex-col gap-6'>
+          <LoginForm />
         </div>
-      )}
-    </div>
+      </div>
+    )
   );
 }
