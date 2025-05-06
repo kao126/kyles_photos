@@ -5,8 +5,8 @@ import { LoginForm } from '@/components/login-form';
 export default async function Login() {
   const session = await auth();
 
-  if (session) {
-    redirect('/');
+  if (session && session.userId) {
+    redirect(`/user/${session.userId}`);
   }
 
   return (
