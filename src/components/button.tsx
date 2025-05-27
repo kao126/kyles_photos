@@ -20,5 +20,5 @@ export function Button() {
     }
   }
 
-  return <input type='file' multiple onChange={handleUpload} />;
+  return <input type='file' accept='image/*,video/*' multiple onChange={handleUpload} />;
 }
