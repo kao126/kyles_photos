@@ -16,6 +16,7 @@ export default async function Page({ params }: { params: Promise<{ userId: strin
     <>
       <div>{userId}</div>
       <Button />
+      <Gallery />
     </>
   );
 }
