@@ -1,5 +1,7 @@
 import { auth } from '@/auth';
 import { Button } from '@/components/button';
+import { Gallery } from '@/components/gallery';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function Page({ params }: { params: Promise<{ userId: string }> }) {

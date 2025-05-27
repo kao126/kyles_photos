@@ -1,7 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { s3Client } from '@/lib/aws/s3';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from '@aws-sdk/client-s3';
 import * as exifr from 'exifr';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+export async function GET(req: NextRequest) {
+  try {
+    const command = new ListObjectsV2Command({
+      Bucket: process.env.S3_BUCKET_NAME || '',
+      Prefix: `photos/`,
+    });
+
+    const { Contents } = await s3Client.send(command);
+    const keys = Contents?.map((obj) => obj.Key!) || [];
+    const urls = [];
+    for (const key of keys) {
+      const getCommand = new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME || '',
+        Key: key,
+      });
+      // 署名付きURLを生成（1時間有効）
+      const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
+      urls.push(url);
+    }
+
+    return NextResponse.json({ urls });
+  } catch (err) {
+    console.error('Error listing user photos:', err);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
