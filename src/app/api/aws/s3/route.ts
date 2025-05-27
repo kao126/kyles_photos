@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No files uploaded' }, { status: 400 });
     }
 
+    let successCount = 0;
     for (const file of files) {
       // ファイルを Buffer に変換
       const arrayBuffer = await file.arrayBuffer();
@@ -41,12 +42,13 @@ export async function POST(req: NextRequest) {
       try {
         await s3Client.send(command);
         console.log('File uploaded successfully');
+        successCount++;
       } catch (error) {
         console.error('Error uploading file:', error);
         throw error;
       }
     }
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ successCount });
   } catch (error) {
     console.error('Upload failed:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
