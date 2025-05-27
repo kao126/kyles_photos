@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export function Button() {
+export function Button({ userId }: { userId: string }) {
   const [totalFiles, setTotalFiles] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -21,7 +21,7 @@ export function Button() {
         formData.append('files', file);
       }
 
-      const res = await fetch('/api/aws/s3', {
+      const res = await fetch(`/api/aws/s3?userId=${userId}`, {
         method: 'POST',
         body: formData,
       });

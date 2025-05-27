@@ -5,10 +5,15 @@ import * as exifr from 'exifr';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export async function GET(req: NextRequest) {
+  const userId = req.nextUrl.searchParams.get('userId');
+  if (!userId) {
+    return new NextResponse('Missing `userId`', { status: 400 });
+  }
+
   try {
     const command = new ListObjectsV2Command({
       Bucket: process.env.S3_BUCKET_NAME || '',
-      Prefix: `photos/`,
+      Prefix: `${userId}/`,
     });
 
     const { Contents } = await s3Client.send(command);
@@ -32,6 +37,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const userId = req.nextUrl.searchParams.get('userId');
+  if (!userId) {
+    return new NextResponse('Missing `userId`', { status: 400 });
+  }
+
   try {
     const formData = await req.formData();
     const files = formData.getAll('files') as File[];
@@ -59,7 +69,7 @@ export async function POST(req: NextRequest) {
 
       const command = new PutObjectCommand({
         Bucket: process.env.S3_BUCKET_NAME || '',
-        Key: `photos/${dateStr}/${file.name}`,
+        Key: `${userId}/${dateStr}/${file.name}`,
         Body: buffer,
         ContentType: file.type,
         Metadata: {

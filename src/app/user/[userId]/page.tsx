@@ -15,8 +15,8 @@ export default async function Page({ params }: { params: Promise<{ userId: strin
   return (
     <>
       <div>{userId}</div>
-      <Button />
-      <Gallery />
+      <Button userId={userId} />
+      <Gallery userId={userId} />
     </>
   );
 }
