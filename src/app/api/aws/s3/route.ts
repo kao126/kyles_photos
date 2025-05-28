@@ -19,17 +19,40 @@ export async function GET(req: NextRequest) {
 
     const { Contents } = await s3Client.send(command);
     const keys = Contents?.map((obj) => obj.Key!) || [];
-    const urls = [];
+
+    // 日付ごとにグループ化するオブジェクト
+    const urls: Record<string, Record<string, { fileName: string; url: string }[]>> = {};
+
     for (const key of keys) {
       const getCommand = new GetObjectCommand({
         Bucket: process.env.S3_BUCKET_NAME || '',
         Key: key,
       });
+
+      const isoDatetime = key.split('/')[1]; // e.g. 2024-12-01T10:30:00.000Z
+      const date = new Date(isoDatetime);
+      if (!date) continue; // 不正な形式はスキップ
+
+      // 日本時間（JST）で取得
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1; // 月は0ベース
+      // const date = isoDatetime?.slice(0, 10); // "YYYY-MM-DD"
+      // if (!date) continue; // 不正な形式はスキップ
+      // const [year, month, _day] = date.split('-');
+
       // ファイル名を取得
       const fileName = path.basename(key);
       // 署名付きURLを生成（1時間有効）
       const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
-      urls.push({ url, fileName });
+
+      if (!urls[year]) {
+        urls[year] = {};
+      }
+      if (!urls[year][month]) {
+        urls[year][month] = [];
+      }
+
+      urls[year][month].push({ url, fileName });
     }
 
     return NextResponse.json({ urls });
