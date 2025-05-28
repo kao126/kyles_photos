@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 export function Gallery({ userId }: { userId: string }) {
-  const [signedUrls, setSignedUrls] = useState<string[]>([]);
+  const [signedUrls, setSignedUrls] = useState<{ url: string; fileName: string }[]>([]);
 
   useEffect(() => {
     fetch(`/api/aws/s3?userId=${userId}`)
@@ -14,8 +14,8 @@ export function Gallery({ userId }: { userId: string }) {
 
   return (
     <div>
-      {signedUrls.map((url) => (
-        <img src={url} alt='photo' key={url} />
+      {signedUrls.map(({ url, fileName }) => (
+        <img src={url} alt={fileName} key={url} />
       ))}
     </div>
   );

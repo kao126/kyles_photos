@@ -3,6 +3,7 @@ import { s3Client } from '@/lib/aws/s3';
 import { GetObjectCommand, ListObjectsV2Command, PutObjectCommand } from '@aws-sdk/client-s3';
 import * as exifr from 'exifr';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import path from 'path';
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId');
@@ -24,9 +25,11 @@ export async function GET(req: NextRequest) {
         Bucket: process.env.S3_BUCKET_NAME || '',
         Key: key,
       });
+      // ファイル名を取得
+      const fileName = path.basename(key);
       // 署名付きURLを生成（1時間有効）
       const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
-      urls.push(url);
+      urls.push({ url, fileName });
     }
 
     return NextResponse.json({ urls });
