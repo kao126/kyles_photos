@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { type Session } from 'next-auth';
 import {
   SidebarContent,
@@ -17,6 +19,9 @@ import { ChevronRight } from 'lucide-react';
 
 export function AppSidebarContent({ session }: { session: Session | null }) {
   const [signedUrls, setSignedUrls] = useState<{ [year: string]: { [month: string]: { url: string; fileName: string }[] } }>({});
+  const searchParams = useSearchParams();
+  const year = searchParams.get('year');
+  const month = searchParams.get('month');
 
   useEffect(() => {
     fetch(`/api/aws/s3?userId=${session?.userId}`)
@@ -25,6 +30,16 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
         setSignedUrls(data.urls);
       });
   }, []);
+
+  useEffect(() => {
+    if (year && month) {
+      const id = `${year}-${month}`;
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [year, month]);
 
   return (
     <SidebarContent>
@@ -46,7 +61,9 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
                       {Object.entries(month).map(([month, _files]) => (
                         <SidebarMenuSubItem key={month}>
                           <SidebarMenuSubButton asChild>
-                            <a href={`#year=${year}&month=${month}`}>{month}月</a>
+                            <Link href={`/user/${session?.userId}?year=${year}&month=${month}`} scroll={false}>
+                              {month}月
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
