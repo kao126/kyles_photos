@@ -1,5 +1,6 @@
 'use client';
 
+import { PlusCircleIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export function Button({ userId }: { userId: string }) {
@@ -36,7 +37,10 @@ export function Button({ userId }: { userId: string }) {
 
   return (
     <div>
-      <input type='file' accept='image/*,video/*' multiple onChange={handleUpload} />
+      <input type='file' id='file-upload' className='hidden' accept='image/*,video/*' multiple onChange={handleUpload} />
+      <label htmlFor='file-upload' className='cursor-pointer flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100 transition'>
+        <PlusCircleIcon />
+      </label>
       {isUploading && (
         <div>
           <p>Uploading {totalFiles} files</p>
