@@ -1,26 +1,21 @@
 'use client';
+import { useEffect, useState } from 'react';
+import { type Session } from 'next-auth';
 import {
-  Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type Session } from 'next-auth';
-import { useEffect, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 
-export function AppSidebar({ session }: { session: Session | null }) {
+export function AppSidebarContent({ session }: { session: Session | null }) {
   const [signedUrls, setSignedUrls] = useState<{ [year: string]: { [month: string]: { url: string; fileName: string }[] } }>({});
 
   useEffect(() => {
@@ -32,22 +27,8 @@ export function AppSidebar({ session }: { session: Session | null }) {
   }, []);
 
   return (
-    <Sidebar className='top-[--header-height] !h-[calc(100svh-var(--header-height))]'>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size='lg' asChild>
-              <a href='#'>
-                <div className='flex size-8 items-center justify-center'>
-                  <img src='/logo.png' alt='logo' className='block' />
-                </div>
-                <span className='text-base font-semibold'>Kyle's Photos</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
+    <SidebarContent>
+      {Object.keys(signedUrls).length > 0 && (
         <SidebarGroup className='group-data-[collapsible=icon]:hidden'>
           <SidebarGroupLabel>年月から探す</SidebarGroupLabel>
           <SidebarMenu>
@@ -65,7 +46,7 @@ export function AppSidebar({ session }: { session: Session | null }) {
                       {Object.entries(month).map(([month, _files]) => (
                         <SidebarMenuSubItem key={month}>
                           <SidebarMenuSubButton asChild>
-                            <a href={`#${year}-${month}`}>{month}月</a>
+                            <a href={`#year=${year}&month=${month}`}>{month}月</a>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -76,22 +57,7 @@ export function AppSidebar({ session }: { session: Session | null }) {
             ))}
           </SidebarMenu>
         </SidebarGroup>
-      </SidebarContent>
-      <SidebarRail />
-      <SidebarFooter>
-        <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
-          {session?.user?.image && (
-            <Avatar className='h-8 w-8 rounded-lg'>
-              <AvatarImage src={session?.user?.image} alt='profile image' />
-              <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
-            </Avatar>
-          )}
-          <div className='grid flex-1 text-left text-sm leading-tight'>
-            <span className='truncate font-semibold'>{session?.user?.name}</span>
-            <span className='truncate text-xs'>{session?.user?.email}</span>
-          </div>
-        </div>
-      </SidebarFooter>
-    </Sidebar>
+      )}
+    </SidebarContent>
   );
 }
