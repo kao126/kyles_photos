@@ -1,6 +1,5 @@
 import { auth } from '@/auth';
 import { Gallery } from '@/components/gallery';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function Page({ params }: { params: Promise<{ userId: string }> }) {
@@ -13,7 +12,6 @@ export default async function Page({ params }: { params: Promise<{ userId: strin
 
   return (
     <>
-      <div>{userId}</div>
       <Gallery userId={session?.userId} />
     </>
   );
