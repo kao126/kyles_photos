@@ -13,9 +13,9 @@ export function Gallery({ userId }: { userId: string }) {
   }, []);
 
   return (
-    <div>
+    <div className='p-4'>
       {Object.entries(signedUrls).map(([year, month]) => (
-        <div key={year}>
+        <div className='p-4' key={year}>
           <p className='text-2xl font-bold'>{year}年</p>
           {Object.entries(month).map(([month, files]) => (
             <div id={`${year}-${month}`} key={month}>
