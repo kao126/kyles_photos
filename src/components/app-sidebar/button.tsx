@@ -38,16 +38,12 @@ export function AppSidebarButton({ userId }: { userId: string }) {
 
   return (
     <SidebarMenuButton asChild>
-      <>
+      <label htmlFor='file-upload' className='cursor-pointer'>
         <input type='file' id='file-upload' className='hidden' accept='image/*,video/*' multiple onChange={handleUpload} />
-        <label
-          htmlFor='file-upload'
-          className='peer/menu-button cursor-pointer flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0'
-        >
-          <PlusCircleIcon />
-          <span>アップロード</span>
-        </label>
-        {isUploading && (
+        <PlusCircleIcon />
+        <span>アップロード</span>
+      </label>
+      {/* {isUploading && (
           <div>
             <p>Uploading {totalFiles} files</p>
           </div>
@@ -56,8 +52,7 @@ export function AppSidebarButton({ userId }: { userId: string }) {
           <div>
             <p>{uploadedFiles} files uploaded successfully</p>
           </div>
-        )}
-      </>
+        )} */}
     </SidebarMenuButton>
   );
 }
