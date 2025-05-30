@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { type Session } from 'next-auth';
 import {
   SidebarContent,
@@ -18,10 +17,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronRight } from 'lucide-react';
 
 export function AppSidebarContent({ session }: { session: Session | null }) {
+  const router = useRouter();
   const [signedUrls, setSignedUrls] = useState<{ [year: string]: { [month: string]: { url: string; fileName: string }[] } }>({});
-  const searchParams = useSearchParams();
-  const year = searchParams.get('year');
-  const month = searchParams.get('month');
 
   useEffect(() => {
     fetch(`/api/aws/s3?userId=${session?.userId}`)
@@ -31,15 +28,13 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
       });
   }, []);
 
-  useEffect(() => {
-    if (year && month) {
-      const id = `${year}-${month}`;
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
+  const scrollToTargetMonth = ({ year, month }: { year: string; month: string }) => {
+    router.push(`/user/${session?.userId}?year=${year}&month=${month}`, { scroll: false });
+    const element = document.getElementById(`${year}-${month}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [year, month]);
+  };
 
   return (
     <SidebarContent>
@@ -60,10 +55,8 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
                     <SidebarMenuSub>
                       {Object.entries(month).map(([month, _files]) => (
                         <SidebarMenuSubItem key={month}>
-                          <SidebarMenuSubButton asChild>
-                            <Link href={`/user/${session?.userId}?year=${year}&month=${month}`} scroll={false}>
-                              {month}月
-                            </Link>
+                          <SidebarMenuSubButton asChild onClick={() => scrollToTargetMonth({ year, month })}>
+                            <span>{month}月</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
