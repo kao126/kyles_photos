@@ -9,7 +9,7 @@ export async function AppSidebar() {
 
   return (
     <Sidebar>
-      <AppSidebarHeader />
+      <AppSidebarHeader session={session} />
       <AppSidebarContent session={session} />
       <SidebarRail />
       <AppSidebarFooter session={session} />
