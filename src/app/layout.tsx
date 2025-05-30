@@ -4,6 +4,7 @@ import './globals.css';
 import { SessionProvider } from 'next-auth/react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
+import { Toaster } from 'sonner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -33,6 +34,7 @@ export default function RootLayout({
             <div className='md:flex md:flex-1'>
               <AppSidebar />
               <div className='md:flex-auto'>{children}</div>
+              <Toaster />
             </div>
           </SidebarProvider>
         </SessionProvider>
