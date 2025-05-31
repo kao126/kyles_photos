@@ -10,9 +10,7 @@ export function AppSidebarHeader({ session }: { session: Session | null }) {
         <SidebarMenuItem>
           <SidebarMenuButton size='lg' asChild>
             <Link href='/'>
-              <div className='flex size-8 items-center justify-center'>
-                <img src='/logo.png' alt='logo' className='block' />
-              </div>
+              <img src='/logo.png' alt='logo' className='size-8' />
               <span className='text-base font-semibold'>Kyle's Photos</span>
             </Link>
           </SidebarMenuButton>
