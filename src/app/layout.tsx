@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
 import { Toaster } from 'sonner';
+import Link from 'next/link';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -33,10 +34,16 @@ export default function RootLayout({
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-              <header className='md:hidden flex h-16 shrink-0 items-center gap-2 border-b px-4 sticky top-0 bg-background z-50'>
-                <SidebarTrigger className='-ml-1' />
+              <header className='md:hidden h-16 border-b sticky top-0 bg-background z-50'>
+                <Link href='/' className='flex justify-center items-center gap-2 h-full'>
+                  <img src='/logo.png' alt='logo' className='size-8' />
+                  <span className='text-base font-semibold'>Kyle's Photos</span>
+                </Link>
               </header>
               <div>{children}</div>
+              <footer className='md:hidden flex justify-center items-center h-16 border-t'>
+                <small>Copyright © 2025 Kyle's Photos All Rights Reserved.</small>
+              </footer>
             </SidebarInset>
             <Toaster />
           </SidebarProvider>
