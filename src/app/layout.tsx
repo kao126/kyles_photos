@@ -40,7 +40,7 @@ export default function RootLayout({
                   <span className='text-base font-semibold'>Kyle's Photos</span>
                 </Link>
               </header>
-              <div>{children}</div>
+              {children}
               <footer className='md:hidden flex justify-center items-center h-16 border-t'>
                 <small>Copyright © 2025 Kyle's Photos All Rights Reserved.</small>
               </footer>
