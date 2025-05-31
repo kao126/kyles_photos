@@ -1,4 +1,5 @@
 'use client';
+import path from 'path';
 import { useState, useEffect } from 'react';
 
 export function Gallery({ userId }: { userId: string }) {
@@ -12,6 +13,12 @@ export function Gallery({ userId }: { userId: string }) {
       });
   }, []);
 
+  const isPhoto = (fileName: string) => {
+    const photoExtensions = ['.jpg', '.jpeg', '.png', '.heic'];
+    const ext = path.extname(fileName).toLowerCase();
+    return photoExtensions.includes(ext);
+  };
+
   return (
     <div className='p-4'>
       {Object.entries(signedUrls).map(([year, month]) => (
@@ -21,11 +28,14 @@ export function Gallery({ userId }: { userId: string }) {
             <div id={`${year}-${month}`} className='py-1' key={month}>
               <p className='text-lg font-bold'>{month}月</p>
               <div className='grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'>
-                {files.map(({ url, fileName }) => (
-                  <div className='w-fit overflow-hidden rounded-xs' key={url}>
-                    <img src={url} alt={fileName} className='w-full h-auto aspect-[1/1] object-cover' />
-                  </div>
-                ))}
+                {files.map(
+                  ({ url, fileName }) =>
+                    isPhoto(fileName) && (
+                      <div className='w-fit overflow-hidden rounded-xs' key={url}>
+                        <img src={url} alt={fileName} className='w-full h-auto aspect-[1/1] object-cover' />
+                      </div>
+                    )
+                )}
               </div>
             </div>
           ))}
