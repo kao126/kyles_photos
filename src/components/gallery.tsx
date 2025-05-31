@@ -15,10 +15,10 @@ export function Gallery({ userId }: { userId: string }) {
   return (
     <div className='p-4'>
       {Object.entries(signedUrls).map(([year, month]) => (
-        <div className='p-4' key={year}>
+        <div className='py-4 md:p-4' key={year}>
           <p className='text-2xl font-bold'>{year}年</p>
           {Object.entries(month).map(([month, files]) => (
-            <div id={`${year}-${month}`} key={month}>
+            <div id={`${year}-${month}`} className='py-1' key={month}>
               <p className='text-lg font-bold'>{month}月</p>
               <div className='grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'>
                 {files.map(({ url, fileName }) => (
