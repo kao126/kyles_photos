@@ -6,6 +6,8 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { AppSidebar } from '@/components/app-sidebar';
 import { Toaster } from 'sonner';
 import Link from 'next/link';
+import { auth } from '@/auth';
+import { UploadButton } from '@/components/upload-button';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,11 +24,12 @@ export const metadata: Metadata = {
   description: 'photos and videos',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -34,11 +37,13 @@ export default function RootLayout({
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-              <header className='md:hidden h-16 border-b sticky top-0 bg-background z-50'>
+              <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
+                <div className='w-8'></div>
                 <Link href='/' className='flex justify-center items-center gap-2 h-full'>
                   <img src='/logo.png' alt='logo' className='size-8' />
                   <span className='text-base font-semibold'>Kyle's Photos</span>
                 </Link>
+                {session?.userId && <UploadButton userId={session?.userId} />}
               </header>
               {children}
               <footer className='md:hidden flex justify-center items-center h-16 border-t'>
