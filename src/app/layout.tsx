@@ -30,12 +30,10 @@ export default function RootLayout({
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProvider>
-          <SidebarProvider className='md:flex md:flex-col'>
-            <div className='md:flex md:flex-1'>
-              <AppSidebar />
-              <div className='md:flex-auto'>{children}</div>
-              <Toaster />
-            </div>
+          <SidebarProvider>
+            <AppSidebar />
+            <div>{children}</div>
+            <Toaster />
           </SidebarProvider>
         </SessionProvider>
       </body>
