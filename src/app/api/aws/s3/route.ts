@@ -35,10 +35,7 @@ export async function GET(req: NextRequest) {
 
       // 日本時間（JST）で取得
       const year = date.getFullYear();
-      const month = date.getMonth() + 1; // 月は0ベース
-      // const date = isoDatetime?.slice(0, 10); // "YYYY-MM-DD"
-      // if (!date) continue; // 不正な形式はスキップ
-      // const [year, month, _day] = date.split('-');
+      const month = date.getMonth() + 1;
 
       // ファイル名を取得
       const fileName = path.basename(key);
