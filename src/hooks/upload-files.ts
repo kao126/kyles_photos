@@ -15,7 +15,7 @@ export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInp
 
     const formData = new FormData();
     for (const file of files) {
-      formData.append('files', file);
+      formData.append('files[]', file);
     }
 
     const res = await fetch(`/api/aws/s3?userId=${userId}`, {
