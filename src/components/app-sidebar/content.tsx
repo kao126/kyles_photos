@@ -53,7 +53,7 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {Object.entries(month).map(([month, _files]) => (
+                      {Object.entries(month).map(([month]) => (
                         <SidebarMenuSubItem key={month}>
                           <SidebarMenuSubButton asChild onClick={() => scrollToTargetMonth({ year, month })}>
                             <span>{month}月</span>

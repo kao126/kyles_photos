@@ -11,7 +11,7 @@ export function AppSidebarHeader({ session }: { session: Session | null }) {
           <SidebarMenuButton size='lg' asChild>
             <Link href='/'>
               <img src='/logo.png' alt='logo' className='size-8' />
-              <span className='text-base font-semibold'>Kyle's Photos</span>
+              <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
