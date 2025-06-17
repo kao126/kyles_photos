@@ -1,4 +1,3 @@
-'use server';
 import * as exifr from 'exifr';
 
 export async function getImageMetadata(buffer: Buffer, dateStr: string) {
