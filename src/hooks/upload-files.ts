@@ -21,12 +21,12 @@ export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInp
 
     let successCount = 0;
     for (const file of files) {
-      const url = await getS3PresignedUrl(file, userId);
-
-      if (!url) continue;
-
       // S3にアップロード
       try {
+        console.log('file: ', file);
+        console.log('userId: ', userId);
+        const url = await getS3PresignedUrl(file, userId);
+        if (!url) continue;
         await fetch(url, {
           method: 'PUT',
           body: file,

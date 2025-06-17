@@ -16,12 +16,14 @@ export async function getS3PresignedUrl(file: File, userId: string) {
     console.warn(`Skipped: ${file.name} (unknown type)`);
     return;
   }
-  
+  console.log('fileType.mime: ', fileType.mime);
   // file情報から撮影日を取得
   let dateStr = new Date().toISOString(); // デフォルト値を設定
   if (fileType.mime.startsWith('image/')) {
     dateStr = await getImageMetadata(buffer, dateStr);
   } else if (fileType.mime.startsWith('video/')) {
+    console.log('fileType: ', fileType);
+    console.log('file.name: ', file.name);
     dateStr = await getVideoMetadata(buffer, dateStr, file.name);
   } else {
     console.warn(`Skipped: ${file.name} (Unsupported file type: ${fileType.mime})`);
