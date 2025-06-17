@@ -12,7 +12,11 @@ export async function getVideoMetadata(buffer: Buffer, dateStr: string, fileName
   const tempPath = path.join('/tmp', fileName);
   await writeFile(tempPath, buffer);
 
+  console.log('ffprobe.path: ', ffprobe.path);
+
   const ffprobePath = ffprobe.path.replace(/^\[project\]\//, '').replace(/\/index\.js \[app-rsc\] \(ecmascript\)/, '');
+
+  console.log('ffprobePath: ', ffprobePath);
 
   const { stdout } = await execFileAsync(ffprobePath, ['-v', 'quiet', '-print_format', 'json', '-show_format', tempPath]);
   const metadata = JSON.parse(stdout);
