@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import { fileTypeFromBuffer } from 'file-type';
 import { getS3PresignedUrl } from '@/lib/presigned-url';
 
 export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInputElement>; userId: string }) {
@@ -23,9 +24,18 @@ export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInp
     for (const file of files) {
       // S3にアップロード
       try {
-        console.log('file: ', file);
-        console.log('userId: ', userId);
-        const url = await getS3PresignedUrl(file, userId);
+        // ファイルを Buffer に変換
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const fileType = await fileTypeFromBuffer(buffer);
+
+        if (!fileType) {
+          console.warn(`Skipped: ${file.name} (unknown type)`);
+          return;
+        }
+        
+        // プリサインドURLを発行
+        const url = await getS3PresignedUrl(buffer, userId, fileType.mime, file.name);
         if (!url) continue;
         await fetch(url, {
           method: 'PUT',

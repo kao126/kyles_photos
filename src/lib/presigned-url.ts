@@ -1,40 +1,27 @@
 'use server';
 import { s3Client } from '@/lib/aws/s3';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { fileTypeFromBuffer } from 'file-type';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getImageMetadata } from '@/lib/exifr';
 import { getVideoMetadata } from '@/lib/ffprobe';
 
-export async function getS3PresignedUrl(file: File, userId: string) {
-  // ファイルを Buffer に変換
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  const fileType = await fileTypeFromBuffer(buffer);
-  
-  if (!fileType) {
-    console.warn(`Skipped: ${file.name} (unknown type)`);
-    return;
-  }
-  console.log('fileType.mime: ', fileType.mime);
+export async function getS3PresignedUrl(buffer: Buffer, userId: string, fileMime: string, fileName: string) {
   // file情報から撮影日を取得
   let dateStr = new Date().toISOString(); // デフォルト値を設定
-  if (fileType.mime.startsWith('image/')) {
+  if (fileMime.startsWith('image/')) {
     dateStr = await getImageMetadata(buffer, dateStr);
-  } else if (fileType.mime.startsWith('video/')) {
-    console.log('fileType: ', fileType);
-    console.log('file.name: ', file.name);
-    dateStr = await getVideoMetadata(buffer, dateStr, file.name);
+  } else if (fileMime.startsWith('video/')) {
+    dateStr = await getVideoMetadata(buffer, dateStr, fileName);
   } else {
-    console.warn(`Skipped: ${file.name} (Unsupported file type: ${fileType.mime})`);
+    console.warn(`Skipped: ${fileName} (Unsupported file type: ${fileMime})`);
     return;
   }
 
   // プリサインドURLを発行
   const command = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME || '',
-    Key: `${userId}/${dateStr}/${file.name}`,
-    ContentType: file.type,
+    Key: `${userId}/${dateStr}/${fileName}`,
+    ContentType: fileMime,
     Metadata: {
       originalDate: dateStr,
     },
