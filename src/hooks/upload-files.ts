@@ -13,10 +13,7 @@ export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInp
 
     const uploadingToastId = toast('アップロード中', {
       description: `Uploading ${files.length} files`,
-      action: {
-        label: 'Undo',
-        onClick: () => toast.dismiss(uploadingToastId),
-      },
+      duration: Infinity,
     });
 
     let successCount = 0;
@@ -100,6 +97,7 @@ export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInp
       }
     }
 
+    toast.dismiss(uploadingToastId);
     const completedToastId = toast('アプロード完了', {
       description: `${successCount} files uploaded successfully`,
       action: {
