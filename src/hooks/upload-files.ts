@@ -17,11 +17,6 @@ export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInp
       },
     });
 
-    const formData = new FormData();
-    for (const file of files) {
-      formData.append('files[]', file);
-    }
-
     let successCount = 0;
     for (const file of files) {
       // S3にアップロード
