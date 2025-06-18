@@ -2,7 +2,9 @@ import { toast } from 'sonner';
 import { fileTypeFromBuffer } from 'file-type';
 import { getImageMetadata } from '@/lib/exifr';
 import { getVideoMetadata, getVideoThumbnail } from '@/actions/aws/lambda';
-import { getS3PresignedUrl, renameS3Object } from '@/actions/aws/s3';
+import { completeMultipartUpload, createMultipartUpload, getS3PresignedUrl, renameS3Object } from '@/actions/aws/s3';
+
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInputElement>; userId: string }) {
   try {
@@ -31,17 +33,44 @@ export async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInp
           return;
         }
 
-        // プリサインドURLを発行
-        const url = await getS3PresignedUrl(userId, fileType.mime, file.name);
-        if (!url) continue;
-        // S3 userId/tmpに一時アップロード
-        await fetch(url, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': fileType.mime,
-          },
-        });
+        const UploadId = await createMultipartUpload(userId, fileType.mime, file.name);
+
+        if (!UploadId) {
+          console.error(`${file.name}: Failed to create multipart upload`);
+          return;
+        }
+
+        const parts: { ETag: string; PartNumber: number }[] = [];
+        const totalParts = Math.ceil(file.size / CHUNK_SIZE);
+
+        for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
+          const start = (partNumber - 1) * CHUNK_SIZE;
+          const end = Math.min(start + CHUNK_SIZE, file.size);
+          const blobPart = file.slice(start, end);
+
+          // プリサインドURLを発行
+          const url = await getS3PresignedUrl(userId, file.name, UploadId, partNumber);
+          if (!url) continue;
+
+          const response = await fetch(url, {
+            method: 'PUT',
+            body: blobPart,
+            headers: {
+              'Content-Type': fileType.mime,
+            },
+          });
+
+          // パートのアップロードが失敗した場合、エラーを投げる
+          if (!response.ok) {
+            throw new Error(`Part ${partNumber} upload failed`);
+          }
+
+          // パートのETagを取得
+          const eTag = response.headers.get('ETag')!;
+          parts.push({ ETag: eTag.replaceAll('"', ''), PartNumber: partNumber });
+        }
+
+        await completeMultipartUpload(userId, file.name, UploadId, parts);
 
         // 撮影日を取得
         let dateStr = new Date().toISOString(); // デフォルト値を設定
