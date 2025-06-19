@@ -10,9 +10,5 @@ export default async function Page({ params }: { params: Promise<{ userId: strin
     redirect('/');
   }
 
-  return (
-    <>
-      <Gallery userId={session?.userId} />
-    </>
-  );
+  return <Gallery userId={session?.userId} />;
 }

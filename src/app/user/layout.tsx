@@ -3,5 +3,5 @@ export default function UserLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <section className='flex-auto'>{children}</section>;
+  return <section className='relative flex-auto'>{children}</section>;
 }

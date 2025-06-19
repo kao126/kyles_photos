@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     const keys = Contents?.map((obj) => obj.Key!) || [];
 
     // 日付ごとにグループ化するオブジェクト
-    const urls: Record<string, Record<string, { fileName: string; url: string }[]>> = {};
+    const urls: Record<string, Record<string, { fileName: string; url: string; day: string }[]>> = {};
 
     for (const key of keys) {
       const getCommand = new GetObjectCommand({
@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
       // 日本時間（JST）で取得
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
+      const day = date.getDate().toString();
 
       // ファイル名を取得
       const fileName = path.basename(key);
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
         urls[year][month] = [];
       }
 
-      urls[year][month].push({ url, fileName });
+      urls[year][month].push({ url, fileName, day });
     }
 
     return NextResponse.json({ urls });
