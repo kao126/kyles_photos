@@ -1,4 +1,4 @@
-import { DialogContent, DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
+import { DialogContent, DialogTitle } from '@radix-ui/react-dialog';
 import { Dialog, DialogHeader } from '@/components/ui/dialog';
 import { Dispatch, SetStateAction } from 'react';
 
