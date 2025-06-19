@@ -8,6 +8,8 @@ import { Toaster } from 'sonner';
 import Link from 'next/link';
 import { auth } from '@/auth';
 import { UploadButton } from '@/components/upload-button';
+import { FileUploadProvider } from '@/contexts/file-upload-context';
+import { ProgressBar } from '@/components/progress-bar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,24 +36,27 @@ export default async function RootLayout({
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SessionProvider>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
-                <div className='w-8'></div>
-                <Link href='/' className='flex justify-center items-center gap-2 h-full'>
-                  <img src='/logo.png' alt='logo' className='size-8' />
-                  <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
-                </Link>
-                {session?.userId && <UploadButton userId={session?.userId} />}
-              </header>
-              {children}
-              <footer className='md:hidden flex justify-center items-center h-16 border-t'>
-                <small>{"Copyright © 2025 Kyle's Photos All Rights Reserved."}</small>
-              </footer>
-            </SidebarInset>
-            <Toaster />
-          </SidebarProvider>
+          <FileUploadProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
+                  <div className='w-8'></div>
+                  <Link href='/' className='flex justify-center items-center gap-2 h-full'>
+                    <img src='/logo.png' alt='logo' className='size-8' />
+                    <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
+                  </Link>
+                  {session?.userId && <UploadButton userId={session?.userId} />}
+                </header>
+                <ProgressBar />
+                {children}
+                <footer className='md:hidden flex justify-center items-center h-16 border-t'>
+                  <small>{"Copyright © 2025 Kyle's Photos All Rights Reserved."}</small>
+                </footer>
+              </SidebarInset>
+              <Toaster />
+            </SidebarProvider>
+          </FileUploadProvider>
         </SessionProvider>
       </body>
     </html>
