@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 export function useFileUploadLogic() {
   const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
   const [progress, setProgress] = useState(0);
 
   async function handleUpload({ e, userId }: { e: React.ChangeEvent<HTMLInputElement>; userId: string }) {
@@ -31,6 +32,7 @@ export function useFileUploadLogic() {
         }
       }
 
+      setUploaded((prev) => !prev);
       toast.dismiss(uploadingToastId);
       const completedToastId = toast('アプロード完了', {
         description: `${successCount} files uploaded successfully`,
@@ -45,5 +47,5 @@ export function useFileUploadLogic() {
       setUploading(false);
     }
   }
-  return { uploading, progress, handleUpload };
+  return { uploading, uploaded, progress, handleUpload };
 }

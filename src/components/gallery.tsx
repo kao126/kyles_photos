@@ -1,9 +1,11 @@
 'use client';
+import { useFileUpload } from '@/contexts/file-upload-context';
 import path from 'path';
 import { useState, useEffect } from 'react';
 
 export function Gallery({ userId }: { userId: string }) {
   const [signedUrls, setSignedUrls] = useState<{ [year: string]: { [month: string]: { url: string; fileName: string }[] } }>({});
+  const { uploaded } = useFileUpload();
 
   useEffect(() => {
     fetch(`/api/aws/s3?userId=${userId}`)
@@ -11,7 +13,7 @@ export function Gallery({ userId }: { userId: string }) {
       .then((data) => {
         setSignedUrls(data.urls);
       });
-  }, []);
+  }, [uploaded]);
 
   const isPhoto = (fileName: string) => {
     const photoExtensions = ['.jpg', '.jpeg', '.png', '.heic'];
