@@ -13,7 +13,7 @@ export function FileDialogContent({ open, setOpen, selectedFile }: { open: boole
         </DialogHeader>
         <div className='flex-1 flex justify-center items-center overflow-hidden pb-6 md:pb-12'>
           {selectedFile.file.videoUrl ? (
-            <video src={selectedFile.file.videoUrl} controls className='w-auto h-full object-contain' />
+            <video src={selectedFile.file.videoUrl} poster={selectedFile.file.imageUrl} controls className='w-auto h-full object-contain' />
           ) : (
             <img src={selectedFile.file.imageUrl} alt={selectedFile.file.fileName} className='w-auto h-full object-contain' />
           )}
