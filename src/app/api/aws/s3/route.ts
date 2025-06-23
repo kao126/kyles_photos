@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 日付ごとにグループ化するオブジェクト
-    const urls: Record<string, Record<string, Partial<MediaEntryType>[]>> = {};
+    const urls: fileUrlsType<Partial<MediaEntryType>> = {};
     const entriesMap: Record<string, Partial<MediaEntryType>> = {};
 
     for (const key of keys) {

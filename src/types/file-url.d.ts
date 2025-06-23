@@ -1,3 +1,3 @@
-type fileUrlsType = {
-  [year: string]: { [month: string]: MediaEntryType[] };
+type fileUrlsType<T = MediaEntryType> = {
+  [year: string]: { [month: string]: T[] };
 };
