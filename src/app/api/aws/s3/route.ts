@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
       const normalizedKey = isDeleted
         ? key.replace('/recently-deleted', '') // ${userId}/recently-deleted/${isoDatetime}/${fileName}
         : key;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [_userId, isoDatetime, fileName] = normalizedKey.split('/'); // ${userId}/${isoDatetime}/${fileName}
       return { isoDatetime, fileName };
     }
