@@ -75,7 +75,7 @@ export async function renameS3Object(userId: string, date: string, fileName: str
 }
 
 export async function recentlyDeletedS3Object({ originalKey }: { originalKey: MediaEntryType['key'] }) {
-  // 対象のS3オブジェクトを一時保管場所(trash)に移す
+  // 対象のS3オブジェクトを最近削除した項目(recently-deleted)に移す
   const [userId, isoDatetime, fileName] = originalKey.split('/');
   const bucket = process.env.S3_BUCKET_NAME || '';
   const copySource = encodeURIComponent(`${bucket}/${originalKey}`);
