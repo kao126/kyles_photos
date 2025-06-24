@@ -61,7 +61,7 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: bool
           </div>
         ))}
       </div>
-      {selectedFile && <FileDialogContent open={isOpen} setOpen={setIsOpen} selectedFile={selectedFile} />}
+      {selectedFile && <FileDialogContent open={isOpen} setOpen={setIsOpen} selectedFile={selectedFile} isDeleted={isDeleted} />}
     </>
   );
 }

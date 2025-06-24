@@ -2,9 +2,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '@/components/ui/button';
 import { MoreVerticalIcon } from 'lucide-react';
 import { useRecentlyDeletedFileLogic } from '@/hooks/use-recently-deleted-file';
+import { useRestoreFileLogic } from '@/hooks/use-restore-file';
 
-export function FileDropDown({ fileKey }: { fileKey: MediaEntryType['key'] }) {
+export function FileDropDown({ fileKey, isDeleted }: { fileKey: MediaEntryType['key']; isDeleted: MediaEntryType['isDeleted'] }) {
   const { handleRecentlyDeletedFile } = useRecentlyDeletedFileLogic();
+  const { handleRestoreFile } = useRestoreFileLogic();
 
   return (
     <DropdownMenu>
@@ -14,9 +16,15 @@ export function FileDropDown({ fileKey }: { fileKey: MediaEntryType['key'] }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='rounded-sm'>
-        <DropdownMenuItem className='text-red-600 hover:bg-gray-100' onClick={() => handleRecentlyDeletedFile({ originalKey: fileKey })}>
-          削除
-        </DropdownMenuItem>
+        {isDeleted ? (
+          <DropdownMenuItem className='hover:bg-gray-100' onClick={() => handleRestoreFile({ originalKey: fileKey })}>
+            復元
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem className='text-red-600 hover:bg-gray-100' onClick={() => handleRecentlyDeletedFile({ originalKey: fileKey })}>
+            削除
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
