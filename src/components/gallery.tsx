@@ -3,7 +3,7 @@ import { useFileUpload } from '@/contexts/file-upload-context';
 import { useState, useEffect } from 'react';
 import { FileDialogContent } from './file-dialog';
 
-export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: boolean }) {
+export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: MediaEntryType['isDeleted'] }) {
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFileType>();
