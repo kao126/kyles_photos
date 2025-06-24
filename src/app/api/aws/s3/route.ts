@@ -29,8 +29,17 @@ export async function GET(req: NextRequest) {
       return 'other';
     }
 
+    function getKeyInfo(key: MediaEntryType['key'], isDeleted: MediaEntryType['isDeleted']) {
+      const normalizedKey = isDeleted
+        ? key.replace('/recently-deleted', '') // ${userId}/recently-deleted/${isoDatetime}/${fileName}
+        : key;
+      const [_userId, isoDatetime, fileName] = normalizedKey.split('/'); // ${userId}/${isoDatetime}/${fileName}
+      return { isoDatetime, fileName };
+    }
+
     // 日付ごとにグループ化するオブジェクト
     const urls: fileUrlsType<Partial<MediaEntryType>> = {};
+    const deletedUrls: fileUrlsType<Partial<MediaEntryType>> = {};
     const entriesMap: Record<string, Partial<MediaEntryType>> = {};
 
     for (const key of keys) {
@@ -42,10 +51,12 @@ export async function GET(req: NextRequest) {
       // fileMimeを取得
       const head = await getHeadObject(bucket, key);
       const fileMime = head.ContentType || '';
+      const lastModifiedDate = head.LastModified;
 
-      const isoDatetime = key.split('/')[1]; // e.g. 2024-12-01T10:30:00.000Z
-      // ファイル名を取得
-      const fileName = path.basename(key);
+      // 削除対応済みファイルかどうか
+      const isDeleted = key.startsWith(`${userId}/recently-deleted/`);
+      // 撮影日/ファイル名を取得
+      const { isoDatetime, fileName } = getKeyInfo(key, isDeleted);
       // 署名付きURLを生成（1時間有効）
       const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
 
@@ -58,7 +69,7 @@ export async function GET(req: NextRequest) {
 
       const groupKey = `${isoDatetime}/${baseFileName}`;
       if (!entriesMap[groupKey]) {
-        entriesMap[groupKey] = { fileName, baseFileName };
+        entriesMap[groupKey] = { fileName, baseFileName, key, isDeleted, lastModifiedDate };
       }
 
       switch (getMimeCategory(fileMime)) {
@@ -87,17 +98,19 @@ export async function GET(req: NextRequest) {
       const day = date.getDate().toString();
       entry.day = day;
 
-      if (!urls[year]) {
-        urls[year] = {};
+      const fileUrls = entry.isDeleted ? deletedUrls : urls;
+
+      if (!fileUrls[year]) {
+        fileUrls[year] = {};
       }
-      if (!urls[year][month]) {
-        urls[year][month] = [];
+      if (!fileUrls[year][month]) {
+        fileUrls[year][month] = [];
       }
 
-      urls[year][month].push(entry);
+      fileUrls[year][month].push(entry);
     }
 
-    return NextResponse.json({ urls });
+    return NextResponse.json({ urls, deletedUrls });
   } catch (err) {
     console.error('Error listing user photos:', err);
     return new NextResponse('Internal Server Error', { status: 500 });

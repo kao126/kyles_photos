@@ -14,7 +14,8 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 
 export function AppSidebarContent({ session }: { session: Session | null }) {
   const router = useRouter();
@@ -24,7 +25,8 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
     fetch(`/api/aws/s3?userId=${session?.userId}`)
       .then((res) => res.json())
       .then((data) => {
-        setSignedUrls(data.urls);
+        const fileUrls = Object.entries(data.urls).length > 0 ? data.urls : data.deletedUrls;
+        setSignedUrls(fileUrls);
       });
   }, []);
 
@@ -68,6 +70,19 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
           </SidebarMenu>
         </SidebarGroup>
       )}
+      <SidebarGroup className='mt-auto'>
+        <SidebarGroupLabel>その他</SidebarGroupLabel>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href={`/user/${session?.userId}/recently-deleted`}>
+                <Trash2 className='w-4 h-4' />
+                <span>最近削除した項目</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
     </SidebarContent>
   );
 }

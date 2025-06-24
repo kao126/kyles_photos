@@ -73,3 +73,14 @@ export async function renameS3Object(userId: string, date: string, fileName: str
   await copyS3Object(bucket, copySource, newKey);
   await deleteS3Object(bucket, tmpKey);
 }
+
+export async function recentlyDeletedS3Object({ originalKey }: { originalKey: MediaEntryType['key'] }) {
+  // 対象のS3オブジェクトを一時保管場所(trash)に移す
+  const [userId, isoDatetime, fileName] = originalKey.split('/');
+  const bucket = process.env.S3_BUCKET_NAME || '';
+  const copySource = encodeURIComponent(`${bucket}/${originalKey}`);
+  const newKey = `${userId}/recently-deleted/${isoDatetime}/${fileName}`;
+
+  await copyS3Object(bucket, copySource, newKey);
+  await deleteS3Object(bucket, originalKey);
+}
