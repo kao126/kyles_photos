@@ -3,7 +3,7 @@ import { getImageMetadata } from '@/lib/exifr';
 import { getVideoMetadata, getVideoThumbnail } from '@/actions/aws/lambda';
 import { completeMultipartUpload, createMultipartUpload, getS3PresignedUrl, renameS3Object } from '@/actions/aws/s3';
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB
 
 export async function uploadFiles({ file, userId }: { file: File; userId: string }) {
   // ファイルを Buffer に変換
