@@ -85,6 +85,12 @@ export async function recentlyDeletedS3Object({ originalKey }: { originalKey: Me
   await deleteS3Object(bucket, originalKey);
 }
 
+export async function completelyDeleteS3Object({ originalKey }: { originalKey: MediaEntryType['key'] }) {
+  // 対象のS3オブジェクトを最近削除した項目から完全に削除する
+  const bucket = process.env.S3_BUCKET_NAME || '';
+  await deleteS3Object(bucket, originalKey);
+}
+
 export async function restoreS3Object({ originalKey }: { originalKey: MediaEntryType['key'] }) {
   // 対象のS3オブジェクトを最近削除した項目(recently-deleted)から元に戻す
   const normalizedKey = originalKey.replace('/recently-deleted', ''); // ${userId}/recently-deleted/${isoDatetime}/${fileName}
