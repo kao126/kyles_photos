@@ -2,6 +2,7 @@
 import { useFileUpload } from '@/contexts/file-upload-context';
 import { useState, useEffect } from 'react';
 import { FileDialogContent } from './file-dialog';
+import { VideoThumbnail } from './video-thumbnail';
 
 export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: MediaEntryType['isDeleted'] }) {
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
@@ -49,7 +50,7 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
                 <div className='grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'>
                   {files.map((file) => (
                     <div className='relative w-fit overflow-hidden rounded-xs' key={file.imageUrl} onClick={() => handleDialog({ year, month, file })}>
-                      <img src={file.imageUrl} alt={file.fileName} className='w-full h-auto aspect-[1/1] object-cover' />
+                      {file.videoUrl ? <VideoThumbnail file={file} /> : <img src={file.imageUrl} alt={file.fileName} className='w-full h-auto aspect-[1/1] object-cover' />}
                       {isDeleted && (
                         <div className='absolute bottom-0 text-center text-white w-full bg-gradient-to-t from-black/60 to-black/0'>{DaysLeft(file.lastModifiedDate)}日前</div>
                       )}

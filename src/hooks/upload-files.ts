@@ -79,9 +79,10 @@ export async function uploadFiles({ file, userId }: { file: File; userId: string
 
   // ファイル名をリネーム
   await renameS3Object(userId, dateStr, file.name);
-  if (fileType.mime.startsWith('video/')) {
-    // 動画のサムネイルを取得
-    const s3Key = `${userId}/${dateStr}/${file.name}`;
-    await getVideoThumbnail(s3Key, file.name);
-  }
+  // if (fileType.mime.startsWith('video/')) {
+  //   // 動画のサムネイルを取得
+  //   const s3Key = `${userId}/${dateStr}/${file.name}`;
+  //   await getVideoThumbnail(s3Key, file.name);
+  //   console.log('s3Key: ', s3Key);
+  // }
 }

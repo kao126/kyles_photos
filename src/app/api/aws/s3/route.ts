@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     }
 
     for (const [key, entry] of Object.entries(entriesMap)) {
-      if (!entry.imageUrl) continue; // imageUrlがないものは表示しない
+      // if (!entry.imageUrl) continue; // imageUrlがないものは表示しない
 
       const isoDatetime = key.split('/')[0]; // key: ${isoDatetime}/${baseFileName}
       const date = new Date(isoDatetime);
