@@ -3,8 +3,6 @@ import { getImageMetadata } from '@/lib/exifr';
 import { getVideoMetadata, getVideoThumbnail } from '@/actions/aws/lambda';
 import { completeMultipartUpload, createMultipartUpload, getS3PresignedUrl, renameS3Object } from '@/actions/aws/s3';
 
-const CHUNK_SIZE = 8 * 1024 * 1024; // 8MB
-
 export async function uploadFiles({ file, userId }: { file: File; userId: string }) {
   // ファイルを Buffer に変換
   const arrayBuffer = await file.arrayBuffer();
@@ -24,11 +22,23 @@ export async function uploadFiles({ file, userId }: { file: File; userId: string
   }
 
   const parts: { ETag: string; PartNumber: number }[] = [];
-  const totalParts = Math.ceil(file.size / CHUNK_SIZE);
+  function getChunkSize(fileSize: number) {
+    if (fileSize <= 50 * 1024 * 1024) {
+      return 8 * 1024 * 1024; // 8MB(単発)
+    } else if (fileSize <= 200 * 1024 * 1024) {
+      return 16 * 1024 * 1024; // 16MB(中型)
+    } else if (fileSize <= 1024 * 1024 * 1024) {
+      return 32 * 1024 * 1024; // 32MB(大型)
+    } else {
+      return 128 * 1024 * 1024; // 128MB(超大型)
+    }
+  }
+  const chunkSize = getChunkSize(file.size);
+  const totalParts = Math.ceil(file.size / chunkSize);
 
   for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
-    const start = (partNumber - 1) * CHUNK_SIZE;
-    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const start = (partNumber - 1) * chunkSize;
+    const end = Math.min(start + chunkSize, file.size);
     const blobPart = file.slice(start, end);
 
     // プリサインドURLを発行
