@@ -21,7 +21,7 @@ export function FileDialogContent({
           <DialogTitle className='text-white'>
             {selectedFile.year}年{selectedFile.month}月{selectedFile.file.day}日
           </DialogTitle>
-          <FileDropDown fileKey={selectedFile.file.key} isDeleted={isDeleted} />
+          <FileDropDown file={selectedFile.file} isDeleted={isDeleted} />
         </DialogHeader>
         <div className='flex-1 flex justify-center items-center overflow-hidden pb-6 md:pb-12'>
           {selectedFile.file.videoUrl ? (

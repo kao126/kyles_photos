@@ -1,6 +1,14 @@
 'use server';
 import { s3Client } from '@/lib/aws/s3';
-import { CompleteMultipartUploadCommand, CopyObjectCommand, CreateMultipartUploadCommand, DeleteObjectCommand, HeadObjectCommand, UploadPartCommand } from '@aws-sdk/client-s3';
+import {
+  CompleteMultipartUploadCommand,
+  CopyObjectCommand,
+  CreateMultipartUploadCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  UploadPartCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export async function createMultipartUpload(userId: string, fileMime: string, fileName: string) {
@@ -42,6 +50,18 @@ export async function getHeadObject(bucket: string, key: string) {
   const headCommand = new HeadObjectCommand({ Bucket: bucket, Key: key });
   const headResult = await s3Client.send(headCommand);
   return headResult;
+}
+
+export async function downloadS3Object(key: string, fileName: MediaEntryType['fileName']) {
+  const bucket = process.env.S3_BUCKET_NAME || '';
+  const getCommand = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ResponseContentDisposition: `attachment; filename="${fileName}"`,
+  });
+
+  const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 60 });
+  return url;
 }
 
 export async function copyS3Object(bucket: string, copySource: string, newKey: string) {
