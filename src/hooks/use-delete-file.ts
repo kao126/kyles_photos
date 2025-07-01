@@ -1,8 +1,10 @@
 'use client';
 import { completelyDeleteS3Object } from '@/actions/aws/s3';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 export function useDeleteFileLogic() {
+  const [isOpen, setIsOpen] = useState(false);
 
   async function handleDeleteFile({ originalKey }: { originalKey: MediaEntryType['key'] }) {
     try {
@@ -24,5 +26,5 @@ export function useDeleteFileLogic() {
     } finally {
     }
   }
-  return { handleDeleteFile };
+  return { isOpen, setIsOpen, handleDeleteFile };
 }
