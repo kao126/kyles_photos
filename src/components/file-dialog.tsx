@@ -1,5 +1,5 @@
 import { DialogContent, DialogTitle } from '@radix-ui/react-dialog';
-import { Dialog, DialogHeader } from '@/components/ui/dialog';
+import { Dialog, DialogDescription, DialogHeader } from '@/components/ui/dialog';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { FileDropDown } from './file-dropdown';
 import { useGenerateThumbnailLogic } from '@/hooks/use-generate-thumbnail';
@@ -30,6 +30,7 @@ export function FileDialogContent({
           <DialogTitle className='text-white'>
             {selectedFile.year}年{selectedFile.month}月{selectedFile.file.day}日
           </DialogTitle>
+          <DialogDescription className='hidden'></DialogDescription>
           <FileDropDown file={selectedFile.file} isDeleted={isDeleted} />
         </DialogHeader>
         <div className='flex-1 flex justify-center items-center overflow-hidden pb-6 md:pb-12'>
