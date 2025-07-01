@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
       // fileMimeを取得
       const head = await getHeadObject(bucket, key);
       const fileMime = head.ContentType || '';
+      const fileMimeCategory = getMimeCategory(fileMime);
       const lastModifiedDate = head.LastModified;
 
       // 削除対応済みファイルかどうか
@@ -70,24 +71,11 @@ export async function GET(req: NextRequest) {
 
       const groupKey = `${isoDatetime}/${baseFileName}`;
       if (!entriesMap[groupKey]) {
-        entriesMap[groupKey] = { fileName, baseFileName, key, isDeleted, lastModifiedDate };
-      }
-
-      switch (getMimeCategory(fileMime)) {
-        case 'image':
-          entriesMap[groupKey].imageUrl = url;
-          break;
-        case 'video':
-          entriesMap[groupKey].videoUrl = url;
-          break;
-        default:
-          console.warn(`Skipped: ${fileName} (Unsupported file type: ${fileMime})`);
-          break;
+        entriesMap[groupKey] = { fileName, baseFileName, fileMimeCategory, key, url, lastModifiedDate, isDeleted };
       }
     }
 
     for (const [key, entry] of Object.entries(entriesMap)) {
-      // if (!entry.imageUrl) continue; // imageUrlがないものは表示しない
 
       const isoDatetime = key.split('/')[0]; // key: ${isoDatetime}/${baseFileName}
       const date = new Date(isoDatetime);

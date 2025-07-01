@@ -1,10 +1,10 @@
 type MediaEntryType = {
   fileName: string;
+  fileMimeCategory: 'image' | 'video' | 'other';
   baseFileName: string;
   key: string;
   day: string;
-  imageUrl: string;
-  videoUrl?: string;
+  url: string;
   lastModifiedDate: Date;
   isDeleted: boolean;
 };

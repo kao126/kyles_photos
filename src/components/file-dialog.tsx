@@ -18,10 +18,10 @@ export function FileDialogContent({
   const { thumbnailUrl, setThumbnailUrl, generateThumbnail } = useGenerateThumbnailLogic();
 
   useEffect(() => {
-    if (selectedFile.file.videoUrl) {
-      generateThumbnail(selectedFile.file.videoUrl).then(setThumbnailUrl);
+    if (selectedFile.file.url && selectedFile.file.fileMimeCategory === 'video') {
+      generateThumbnail(selectedFile.file.url).then(setThumbnailUrl);
     }
-  }, [selectedFile.file.videoUrl]);
+  }, [selectedFile.file.url]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -33,10 +33,10 @@ export function FileDialogContent({
           <FileDropDown file={selectedFile.file} isDeleted={isDeleted} />
         </DialogHeader>
         <div className='flex-1 flex justify-center items-center overflow-hidden pb-6 md:pb-12'>
-          {selectedFile.file.videoUrl ? (
-            <video src={selectedFile.file.videoUrl} poster={thumbnailUrl} controls className='w-auto h-full object-contain' />
+          {selectedFile.file.fileMimeCategory === 'video' ? (
+            <video src={selectedFile.file.url} poster={thumbnailUrl} controls className='w-auto h-full object-contain' />
           ) : (
-            <img src={selectedFile.file.imageUrl} alt={selectedFile.file.fileName} className='w-auto h-full object-contain' />
+            <img src={selectedFile.file.url} alt={selectedFile.file.fileName} className='w-auto h-full object-contain' />
           )}
         </div>
       </DialogContent>

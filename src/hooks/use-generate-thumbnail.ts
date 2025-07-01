@@ -5,10 +5,7 @@ import { useState } from 'react';
 export function useGenerateThumbnailLogic() {
   const [thumbnailUrl, setThumbnailUrl] = useState<string>();
 
-  async function generateThumbnail(videoUrl: MediaEntryType['videoUrl']): Promise<string> {
-    if (!videoUrl) {
-      return '';
-    }
+  async function generateThumbnail(videoUrl: MediaEntryType['url']): Promise<string> {
     return new Promise((resolve, reject) => {
       const video = document.createElement('video');
       video.src = videoUrl;
