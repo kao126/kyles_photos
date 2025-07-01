@@ -21,25 +21,25 @@ export async function getVideoMetadata(userId: string, fileName: string) {
   return payload.body.creationTime;
 }
 
-export async function getVideoThumbnail(s3Key: string, fileName: string) {
-  try {
-    const command = new InvokeCommand({
-      FunctionName: process.env.LAMBDA_CREATE_VIDEO_THUMBNAIL_FUNCTION || '',
-      InvocationType: 'RequestResponse',
-      Payload: Buffer.from(
-        JSON.stringify({
-          s3Key: s3Key,
-          fileName: fileName,
-        })
-      ),
-    });
+// export async function getVideoThumbnail(s3Key: string, fileName: string) {
+//   try {
+//     const command = new InvokeCommand({
+//       FunctionName: process.env.LAMBDA_CREATE_VIDEO_THUMBNAIL_FUNCTION || '',
+//       InvocationType: 'RequestResponse',
+//       Payload: Buffer.from(
+//         JSON.stringify({
+//           s3Key: s3Key,
+//           fileName: fileName,
+//         })
+//       ),
+//     });
 
-    const response = await lambdaClient.send(command);
-    const payloadString = Buffer.from(response.Payload!).toString();
-    const payload = JSON.parse(payloadString);
-    return payload.statusCode;
-  } catch (error) {
-    console.error('Error getting video thumbnail:', error);
-    throw error;
-  }
-}
+//     const response = await lambdaClient.send(command);
+//     const payloadString = Buffer.from(response.Payload!).toString();
+//     const payload = JSON.parse(payloadString);
+//     return payload.statusCode;
+//   } catch (error) {
+//     console.error('Error getting video thumbnail:', error);
+//     throw error;
+//   }
+// }

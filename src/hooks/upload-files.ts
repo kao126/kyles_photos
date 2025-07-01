@@ -1,6 +1,7 @@
 import { fileTypeFromBuffer } from 'file-type';
 import { getImageMetadata } from '@/lib/exifr';
-import { getVideoMetadata, getVideoThumbnail } from '@/actions/aws/lambda';
+// import { getVideoMetadata, getVideoThumbnail } from '@/actions/aws/lambda';
+import { getVideoMetadata } from '@/actions/aws/lambda';
 import { completeMultipartUpload, createMultipartUpload, getS3PresignedUrl, renameS3Object } from '@/actions/aws/s3';
 
 export async function uploadFiles({ file, userId }: { file: File; userId: string }) {
