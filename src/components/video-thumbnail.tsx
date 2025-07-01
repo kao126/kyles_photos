@@ -12,10 +12,17 @@ export function VideoThumbnail({ file }: { file: MediaEntryType }) {
       video.src = videoUrl;
       video.crossOrigin = 'anonymous';
       video.muted = true;
+      video.playsInline = true;
 
-      video.addEventListener('loadeddata', () => {
-        video.currentTime = 1;
-      });
+      video.addEventListener(
+        'loadedmetadata',
+        () => {
+          video.play().then(() => {
+            video.currentTime = 0;
+          });
+        },
+        { once: true }
+      );
 
       video.addEventListener('seeked', () => {
         const canvas = document.createElement('canvas');
