@@ -4,6 +4,7 @@ import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import path from 'path';
 import { getHeadObject } from '@/actions/aws/s3';
+import { getMimeCategory } from '@/lib/mime-category';
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId');
@@ -20,14 +21,6 @@ export async function GET(req: NextRequest) {
 
     const { Contents } = await s3Client.send(command);
     const keys = Contents?.map((obj) => obj.Key!) || [];
-
-    type FileMime = 'image' | 'video' | 'other';
-
-    function getMimeCategory(mime: string): FileMime {
-      if (mime.startsWith('image/')) return 'image';
-      if (mime.startsWith('video/')) return 'video';
-      return 'other';
-    }
 
     function getKeyInfo(key: MediaEntryType['key'], isDeleted: MediaEntryType['isDeleted']) {
       const normalizedKey = isDeleted
