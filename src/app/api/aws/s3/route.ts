@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { s3Client } from '@/lib/aws/s3';
 import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import path from 'path';
 import { getHeadObject } from '@/actions/aws/s3';
 import { getMimeCategory } from '@/lib/mime-category';
 
@@ -32,9 +31,8 @@ export async function GET(req: NextRequest) {
     }
 
     // 日付ごとにグループ化するオブジェクト
-    const urls: fileUrlsType<Partial<MediaEntryType>> = {};
-    const deletedUrls: fileUrlsType<Partial<MediaEntryType>> = {};
-    const entriesMap: Record<string, Partial<MediaEntryType>> = {};
+    const urls: fileUrlsType<MediaEntryType> = {};
+    const deletedUrls: fileUrlsType<MediaEntryType> = {};
 
     for (const key of keys) {
       const getCommand = new GetObjectCommand({
@@ -46,41 +44,24 @@ export async function GET(req: NextRequest) {
       const head = await getHeadObject(bucket, key);
       const fileMime = head.ContentType || '';
       const fileMimeCategory = getMimeCategory(fileMime);
-      const lastModifiedDate = head.LastModified;
+      const lastModifiedDate = head.LastModified!;
 
       // 削除対応済みファイルかどうか
       const isDeleted = key.startsWith(`${userId}/recently-deleted/`);
       // 撮影日/ファイル名を取得
       const { isoDatetime, fileName } = getKeyInfo(key, isDeleted);
-      // 署名付きURLを生成（1時間有効）
-      const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
-
-      const parsed = path.parse(fileName);
-      let baseFileName = parsed.name;
-
-      if (baseFileName.endsWith('_thumb')) {
-        baseFileName = baseFileName.replace(/_thumb$/, '');
-      }
-
-      const groupKey = `${isoDatetime}/${baseFileName}`;
-      if (!entriesMap[groupKey]) {
-        entriesMap[groupKey] = { fileName, baseFileName, fileMimeCategory, key, url, lastModifiedDate, isDeleted };
-      }
-    }
-
-    for (const [key, entry] of Object.entries(entriesMap)) {
-
-      const isoDatetime = key.split('/')[0]; // key: ${isoDatetime}/${baseFileName}
-      const date = new Date(isoDatetime);
-      if (!date) continue; // 不正な形式はスキップ
 
       // 日本時間（JST）で取得
+      const date = new Date(isoDatetime);
+      if (!date) continue; // 不正な形式はスキップ
       const year = date.getFullYear().toString();
       const month = (date.getMonth() + 1).toString();
       const day = date.getDate().toString();
-      entry.day = day;
 
-      const fileUrls = entry.isDeleted ? deletedUrls : urls;
+      // 署名付きURLを生成（1時間有効）
+      const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
+
+      const fileUrls = isDeleted ? deletedUrls : urls;
 
       if (!fileUrls[year]) {
         fileUrls[year] = {};
@@ -89,7 +70,7 @@ export async function GET(req: NextRequest) {
         fileUrls[year][month] = [];
       }
 
-      fileUrls[year][month].push(entry);
+      fileUrls[year][month].push({ fileName, fileMimeCategory, key, day, url, lastModifiedDate, isDeleted });
     }
 
     return NextResponse.json({ urls, deletedUrls });
