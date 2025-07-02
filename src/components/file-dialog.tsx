@@ -23,9 +23,18 @@ export function FileDialogContent({
     }
   }, [selectedFile.file.url]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+    return () => document.body.classList.remove('overflow-hidden');
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className='absolute inset-0 bg-black/90 h-full flex flex-col'>
+      <DialogContent className='fixed md:top-0 right-0 bottom-0 w-full md:w-[calc(100vw-var(--sidebar-width))] h-[calc(100dvh-4rem)] md:h-full bg-black/90 flex flex-col'>
         <DialogHeader className='flex flex-row justify-between items-center p-4'>
           <DialogTitle className='text-white'>
             {selectedFile.year}年{selectedFile.month}月{selectedFile.file.day}日
