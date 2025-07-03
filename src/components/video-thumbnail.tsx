@@ -18,7 +18,7 @@ export function VideoThumbnail({ file }: { file: MediaEntryType }) {
   return thumbnailUrl && duration > 0 ? (
     <div className='relative'>
       <img src={thumbnailUrl} alt={file.fileName} className='w-full aspect-square object-cover' />
-      <span className='absolute bottom-0 right-0 text-white font-semibold text-sm p-1'>{formatVideoDuration(duration)}</span>
+      <span className='absolute bottom-0 right-0 text-white font-semibold text-sm md:text-base p-1 md:p-1.5'>{formatVideoDuration(duration)}</span>
     </div>
   ) : (
     <Skeleton className='w-full aspect-square' />
