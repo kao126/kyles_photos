@@ -1,16 +1,19 @@
 'use client';
 import { useFileUpload } from '@/contexts/file-upload-context';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FileDialogContent } from './file-dialog';
 import { VideoThumbnail } from './video-thumbnail';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: MediaEntryType['isDeleted'] }) {
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
+  const [continuationToken, setContinuationToken] = useState<string | null>(null);
+  const [isTruncated, setIsTruncated] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFileType>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { uploaded } = useFileUpload();
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch(`/api/aws/s3?userId=${userId}`)
@@ -18,8 +21,60 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
       .then((data) => {
         const fileUrls = isDeleted ? data.deletedUrls : data.urls;
         setSignedUrls(fileUrls);
+        setContinuationToken(data.NextContinuationToken);
+        setIsTruncated(data.IsTruncated);
       });
   }, [uploaded]);
+
+  useEffect(() => {
+    if (!loaderRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && isTruncated) {
+          const encodedToken = encodeURIComponent(continuationToken ?? '');
+          fetch(`/api/aws/s3?userId=${userId}&continuationToken=${encodedToken}`)
+            .then((res) => res.json())
+            .then((data) => {
+              const fileUrls = isDeleted ? data.deletedUrls : data.urls;
+              setSignedUrls((prev) => {
+                const newSignedUrls: fileUrlsType<MediaEntryType> = {};
+
+                // まず prev をコピー
+                for (const year in prev) {
+                  newSignedUrls[year] = {};
+                  for (const month in prev[year]) {
+                    newSignedUrls[year][month] = [...prev[year][month]];
+                  }
+                }
+
+                // fileUrls をマージ
+                for (const year in fileUrls) {
+                  if (!newSignedUrls[year]) newSignedUrls[year] = {};
+
+                  for (const month in fileUrls[year]) {
+                    if (!newSignedUrls[year][month]) {
+                      newSignedUrls[year][month] = [...fileUrls[year][month]];
+                    } else {
+                      newSignedUrls[year][month] = [...newSignedUrls[year][month], ...fileUrls[year][month]];
+                    }
+                  }
+                }
+
+                return newSignedUrls;
+              });
+              setContinuationToken(data.NextContinuationToken);
+              setIsTruncated(data.IsTruncated);
+            });
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    observer.observe(loaderRef.current);
+
+    return () => observer.disconnect();
+  }, [loaderRef.current, isTruncated]);
 
   function handleDialog({ year, month, file }: { year: string; month: string; file: MediaEntryType }) {
     setIsOpen((prev) => !prev);
@@ -70,6 +125,7 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
                       )}
                     </div>
                   ))}
+                  <div ref={loaderRef} className='h-10'></div>
                 </div>
               </div>
             ))}

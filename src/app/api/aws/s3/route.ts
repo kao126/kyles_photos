@@ -7,6 +7,8 @@ import { getMimeCategory } from '@/lib/mime-category';
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId');
+  const continuationToken = decodeURIComponent(req.nextUrl.searchParams.get('continuationToken') ?? '');
+
   if (!userId) {
     return new NextResponse('Missing `userId`', { status: 400 });
   }
@@ -16,9 +18,11 @@ export async function GET(req: NextRequest) {
     const command = new ListObjectsV2Command({
       Bucket: bucket,
       Prefix: `${userId}/`,
+      MaxKeys: 20,
+      ContinuationToken: continuationToken || undefined,
     });
 
-    const { Contents } = await s3Client.send(command);
+    const { Contents, NextContinuationToken, IsTruncated } = await s3Client.send(command);
     const keys = Contents?.map((obj) => obj.Key!) || [];
 
     function getKeyInfo(key: MediaEntryType['key'], isDeleted: MediaEntryType['isDeleted']) {
@@ -73,7 +77,7 @@ export async function GET(req: NextRequest) {
       fileUrls[year][month].push({ fileName, fileMimeCategory, key, day, url, lastModifiedDate, isDeleted });
     }
 
-    return NextResponse.json({ urls, deletedUrls });
+    return NextResponse.json({ urls, deletedUrls, NextContinuationToken, IsTruncated });
   } catch (err) {
     console.error('Error listing user photos:', err);
     return new NextResponse('Internal Server Error', { status: 500 });
