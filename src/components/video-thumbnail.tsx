@@ -1,6 +1,7 @@
 import { useGenerateThumbnailLogic } from '@/hooks/use-generate-thumbnail';
 import { formatVideoDuration } from '@/lib/format-video-duration';
 import { useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function VideoThumbnail({ file }: { file: MediaEntryType }) {
   const { thumbnailUrl, setThumbnailUrl, duration, setDuration, generateThumbnail } = useGenerateThumbnailLogic();
@@ -14,10 +15,12 @@ export function VideoThumbnail({ file }: { file: MediaEntryType }) {
     }
   }, [file.url]);
 
-  return (
+  return thumbnailUrl && duration > 0 ? (
     <div className='relative'>
-      <img src={thumbnailUrl} alt={file.fileName} className='w-full h-auto aspect-[1/1] object-cover' />
+      <img src={thumbnailUrl} alt={file.fileName} className='w-full aspect-square object-cover' />
       <span className='absolute bottom-0 right-0 text-white font-semibold text-sm p-1'>{formatVideoDuration(duration)}</span>
     </div>
+  ) : (
+    <Skeleton className='w-full aspect-square' />
   );
 }

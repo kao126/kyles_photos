@@ -3,11 +3,13 @@ import { useFileUpload } from '@/contexts/file-upload-context';
 import { useState, useEffect } from 'react';
 import { FileDialogContent } from './file-dialog';
 import { VideoThumbnail } from './video-thumbnail';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: MediaEntryType['isDeleted'] }) {
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFileType>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { uploaded } = useFileUpload();
 
   useEffect(() => {
@@ -49,11 +51,19 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
                 <p className='text-lg font-bold'>{month}月</p>
                 <div className='grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'>
                   {files.map((file) => (
-                    <div className='relative w-fit overflow-hidden rounded-xs' key={file.url} onClick={() => handleDialog({ year, month, file })}>
+                    <div className='relative overflow-hidden rounded-xs' key={file.url} onClick={() => handleDialog({ year, month, file })}>
                       {file.fileMimeCategory === 'video' ? (
                         <VideoThumbnail file={file} />
                       ) : (
-                        <img src={file.url} alt={file.fileName} className='w-full h-auto aspect-[1/1] object-cover' />
+                        <>
+                          {isLoading && <Skeleton className='w-full aspect-square' />}
+                          <img
+                            src={file.url}
+                            alt={file.fileName}
+                            className={`w-full aspect-square object-cover ${isLoading ? 'hidden' : 'block'}`}
+                            onLoad={() => setIsLoading(false)}
+                          />
+                        </>
                       )}
                       {isDeleted && (
                         <div className='absolute bottom-0 text-center text-white w-full bg-gradient-to-t from-black/60 to-black/0'>{DaysLeft(file.lastModifiedDate)}日前</div>
