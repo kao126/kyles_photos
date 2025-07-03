@@ -19,7 +19,9 @@ export function FileDialogContent({
 
   useEffect(() => {
     if (selectedFile.file.url && selectedFile.file.fileMimeCategory === 'video') {
-      generateThumbnail(selectedFile.file.url).then(setThumbnailUrl);
+      generateThumbnail(selectedFile.file.url).then(({ thumbnail }) => {
+        setThumbnailUrl(thumbnail);
+      });
     }
   }, [selectedFile.file.url]);
 
