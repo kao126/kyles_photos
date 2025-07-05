@@ -64,12 +64,14 @@ export async function downloadS3Object(key: string, fileName: MediaEntryType['fi
   return url;
 }
 
-export async function copyS3Object(bucket: string, copySource: string, newKey: string) {
+export async function copyS3Object(bucket: string, copySource: string, newKey: string, newStatus: string) {
   await s3Client.send(
     new CopyObjectCommand({
       Bucket: bucket,
       CopySource: copySource,
       Key: newKey,
+      TaggingDirective: 'REPLACE',
+      Tagging: `Status=${newStatus}`,
     })
   );
 }
@@ -88,9 +90,10 @@ export async function renameS3Object(userId: string, date: string, fileName: str
   const bucket = process.env.S3_BUCKET_NAME || '';
   const tmpKey = `${userId}/tmp/${fileName}`;
   const copySource = `${bucket}/${userId}/tmp/${fileName}`;
-  const newKey = `${userId}/active/${date}/${fileName}`;
+  const newStatus = 'active';
+  const newKey = `${userId}/${newStatus}/${date}/${fileName}`;
 
-  await copyS3Object(bucket, copySource, newKey);
+  await copyS3Object(bucket, copySource, newKey, newStatus);
   await deleteS3Object(bucket, tmpKey);
 }
 
@@ -98,9 +101,10 @@ export async function recentlyDeletedS3Object({ originalKey }: { originalKey: Me
   // 対象のS3オブジェクトを最近削除した項目(recently-deleted)に移す
   const bucket = process.env.S3_BUCKET_NAME || '';
   const copySource = encodeURIComponent(`${bucket}/${originalKey}`);
-  const newKey = originalKey.replace('/active', '/recently-deleted'); // ${userId}/${state}/${isoDatetime}/${fileName}
+  const newStatus = 'recently-deleted';
+  const newKey = originalKey.replace('/active', `/${newStatus}`); // ${userId}/${state}/${isoDatetime}/${fileName}
 
-  await copyS3Object(bucket, copySource, newKey);
+  await copyS3Object(bucket, copySource, newKey, newStatus);
   await deleteS3Object(bucket, originalKey);
 }
 
@@ -114,8 +118,9 @@ export async function restoreS3Object({ originalKey }: { originalKey: MediaEntry
   // 対象のS3オブジェクトを最近削除した項目(recently-deleted)から元に戻す
   const bucket = process.env.S3_BUCKET_NAME || '';
   const copySource = encodeURIComponent(`${bucket}/${originalKey}`);
-  const newKey = originalKey.replace('/recently-deleted', '/active'); // ${userId}/${state}/${isoDatetime}/${fileName}
+  const newStatus = 'active';
+  const newKey = originalKey.replace('/recently-deleted', `/${newStatus}`); // ${userId}/${state}/${isoDatetime}/${fileName}
 
-  await copyS3Object(bucket, copySource, newKey);
+  await copyS3Object(bucket, copySource, newKey, newStatus);
   await deleteS3Object(bucket, originalKey);
 }
