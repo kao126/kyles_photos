@@ -8,6 +8,7 @@ import { getMimeCategory } from '@/lib/mime-category';
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId');
   const continuationToken = decodeURIComponent(req.nextUrl.searchParams.get('continuationToken') ?? '');
+  const isDeleted = Boolean(req.nextUrl.searchParams.get('isDeleted'));
 
   if (!userId) {
     return new NextResponse('Missing `userId`', { status: 400 });
@@ -15,9 +16,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const bucket = process.env.S3_BUCKET_NAME || '';
+    const state = isDeleted ? 'recently-deleted' : 'active';
     const command = new ListObjectsV2Command({
       Bucket: bucket,
-      Prefix: `${userId}/`,
+      Prefix: `${userId}/${state}`,
       MaxKeys: 20,
       ContinuationToken: continuationToken || undefined,
     });
@@ -25,18 +27,8 @@ export async function GET(req: NextRequest) {
     const { Contents, NextContinuationToken, IsTruncated } = await s3Client.send(command);
     const keys = Contents?.map((obj) => obj.Key!) || [];
 
-    function getKeyInfo(key: MediaEntryType['key'], isDeleted: MediaEntryType['isDeleted']) {
-      const normalizedKey = isDeleted
-        ? key.replace('/recently-deleted', '') // ${userId}/recently-deleted/${isoDatetime}/${fileName}
-        : key;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [_userId, isoDatetime, fileName] = normalizedKey.split('/'); // ${userId}/${isoDatetime}/${fileName}
-      return { isoDatetime, fileName };
-    }
-
     // 日付ごとにグループ化するオブジェクト
     const urls: fileUrlsType<MediaEntryType> = {};
-    const deletedUrls: fileUrlsType<MediaEntryType> = {};
 
     for (const key of keys) {
       const getCommand = new GetObjectCommand({
@@ -50,10 +42,9 @@ export async function GET(req: NextRequest) {
       const fileMimeCategory = getMimeCategory(fileMime);
       const lastModifiedDate = head.LastModified!;
 
-      // 削除対応済みファイルかどうか
-      const isDeleted = key.startsWith(`${userId}/recently-deleted/`);
       // 撮影日/ファイル名を取得
-      const { isoDatetime, fileName } = getKeyInfo(key, isDeleted);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [_userId, _state, isoDatetime, fileName] = key.split('/'); // ${userId}/${state}/${isoDatetime}/${fileName}
 
       // 日本時間（JST）で取得
       const date = new Date(isoDatetime);
@@ -65,19 +56,17 @@ export async function GET(req: NextRequest) {
       // 署名付きURLを生成（1時間有効）
       const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
 
-      const fileUrls = isDeleted ? deletedUrls : urls;
-
-      if (!fileUrls[year]) {
-        fileUrls[year] = {};
+      if (!urls[year]) {
+        urls[year] = {};
       }
-      if (!fileUrls[year][month]) {
-        fileUrls[year][month] = [];
+      if (!urls[year][month]) {
+        urls[year][month] = [];
       }
 
-      fileUrls[year][month].push({ fileName, fileMimeCategory, key, day, url, lastModifiedDate, isDeleted });
+      urls[year][month].push({ fileName, fileMimeCategory, key, day, url, lastModifiedDate, isDeleted });
     }
 
-    return NextResponse.json({ urls, deletedUrls, NextContinuationToken, IsTruncated });
+    return NextResponse.json({ urls, NextContinuationToken, IsTruncated });
   } catch (err) {
     console.error('Error listing user photos:', err);
     return new NextResponse('Internal Server Error', { status: 500 });

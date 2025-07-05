@@ -16,11 +16,11 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(`/api/aws/s3?userId=${userId}`)
+    const url = isDeleted ? `/api/aws/s3?userId=${userId}&isDeleted=true` : `/api/aws/s3?userId=${userId}`;
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
-        const fileUrls = isDeleted ? data.deletedUrls : data.urls;
-        setSignedUrls(fileUrls);
+        setSignedUrls(data.urls);
         setContinuationToken(data.NextContinuationToken);
         setIsTruncated(data.IsTruncated);
       });
@@ -33,10 +33,13 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
       (entries) => {
         if (entries[0].isIntersecting && isTruncated) {
           const encodedToken = encodeURIComponent(continuationToken ?? '');
-          fetch(`/api/aws/s3?userId=${userId}&continuationToken=${encodedToken}`)
+          const url = isDeleted
+            ? `/api/aws/s3?userId=${userId}&continuationToken=${encodedToken}&isDeleted=true`
+            : `/api/aws/s3?userId=${userId}&continuationToken=${encodedToken}`;
+          fetch(url)
             .then((res) => res.json())
             .then((data) => {
-              const fileUrls = isDeleted ? data.deletedUrls : data.urls;
+              const fileUrls = data.urls;
               setSignedUrls((prev) => {
                 const newSignedUrls: fileUrlsType<MediaEntryType> = {};
 

@@ -88,7 +88,7 @@ export async function renameS3Object(userId: string, date: string, fileName: str
   const bucket = process.env.S3_BUCKET_NAME || '';
   const tmpKey = `${userId}/tmp/${fileName}`;
   const copySource = `${bucket}/${userId}/tmp/${fileName}`;
-  const newKey = `${userId}/${date}/${fileName}`;
+  const newKey = `${userId}/active/${date}/${fileName}`;
 
   await copyS3Object(bucket, copySource, newKey);
   await deleteS3Object(bucket, tmpKey);
@@ -96,10 +96,9 @@ export async function renameS3Object(userId: string, date: string, fileName: str
 
 export async function recentlyDeletedS3Object({ originalKey }: { originalKey: MediaEntryType['key'] }) {
   // 対象のS3オブジェクトを最近削除した項目(recently-deleted)に移す
-  const [userId, isoDatetime, fileName] = originalKey.split('/');
   const bucket = process.env.S3_BUCKET_NAME || '';
   const copySource = encodeURIComponent(`${bucket}/${originalKey}`);
-  const newKey = `${userId}/recently-deleted/${isoDatetime}/${fileName}`;
+  const newKey = originalKey.replace('/active', '/recently-deleted'); // ${userId}/${state}/${isoDatetime}/${fileName}
 
   await copyS3Object(bucket, copySource, newKey);
   await deleteS3Object(bucket, originalKey);
@@ -113,11 +112,9 @@ export async function completelyDeleteS3Object({ originalKey }: { originalKey: M
 
 export async function restoreS3Object({ originalKey }: { originalKey: MediaEntryType['key'] }) {
   // 対象のS3オブジェクトを最近削除した項目(recently-deleted)から元に戻す
-  const normalizedKey = originalKey.replace('/recently-deleted', ''); // ${userId}/recently-deleted/${isoDatetime}/${fileName}
-  const [userId, isoDatetime, fileName] = normalizedKey.split('/'); // ${userId}/${isoDatetime}/${fileName}
   const bucket = process.env.S3_BUCKET_NAME || '';
   const copySource = encodeURIComponent(`${bucket}/${originalKey}`);
-  const newKey = `${userId}/${isoDatetime}/${fileName}`;
+  const newKey = originalKey.replace('/recently-deleted', '/active'); // ${userId}/${state}/${isoDatetime}/${fileName}
 
   await copyS3Object(bucket, copySource, newKey);
   await deleteS3Object(bucket, originalKey);
