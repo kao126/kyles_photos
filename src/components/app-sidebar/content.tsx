@@ -25,8 +25,7 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
     fetch(`/api/aws/s3?userId=${session?.userId}`)
       .then((res) => res.json())
       .then((data) => {
-        const fileUrls = Object.entries(data.urls).length > 0 ? data.urls : data.deletedUrls;
-        setSignedUrls(fileUrls);
+        setSignedUrls(data.urls);
       });
   }, []);
 
