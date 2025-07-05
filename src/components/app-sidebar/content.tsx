@@ -31,7 +31,7 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
       .then((data) => {
         setSignedUrls(data.urls);
       });
-  }, [signedUrls]);
+  }, [isDeleted]);
 
   const scrollToTargetMonth = ({ year, month }: { year: string; month: string }) => {
     router.push(`${pathname}?year=${year}&month=${month}`, { scroll: false });
