@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { type Session } from 'next-auth';
 import {
   SidebarContent,
@@ -19,18 +19,22 @@ import Link from 'next/link';
 
 export function AppSidebarContent({ session }: { session: Session | null }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isDeleted = pathname.endsWith('/recently-deleted');
+
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
 
   useEffect(() => {
-    fetch(`/api/aws/s3?userId=${session?.userId}`)
+    const url = isDeleted ? `/api/aws/s3?userId=${session?.userId}&isDeleted=true` : `/api/aws/s3?userId=${session?.userId}`;
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         setSignedUrls(data.urls);
       });
-  }, []);
+  }, [signedUrls]);
 
   const scrollToTargetMonth = ({ year, month }: { year: string; month: string }) => {
-    router.push(`/user/${session?.userId}?year=${year}&month=${month}`, { scroll: false });
+    router.push(`${pathname}?year=${year}&month=${month}`, { scroll: false });
     const element = document.getElementById(`${year}-${month}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
