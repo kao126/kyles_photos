@@ -19,7 +19,7 @@ import Link from 'next/link';
 
 export function AppSidebarContent({ session }: { session: Session | null }) {
   const router = useRouter();
-  const [signedUrls, setSignedUrls] = useState<{ [year: string]: { [month: string]: { url: string; fileName: string }[] } }>({});
+  const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
 
   useEffect(() => {
     fetch(`/api/aws/s3?userId=${session?.userId}`)
