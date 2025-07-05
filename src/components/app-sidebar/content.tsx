@@ -14,7 +14,7 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronRight, Trash2 } from 'lucide-react';
+import { ChevronRight, Trash2, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 
 export function AppSidebarContent({ session }: { session: Session | null }) {
@@ -74,8 +74,15 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
         </SidebarGroup>
       )}
       <SidebarGroup className='mt-auto'>
-        <SidebarGroupLabel>その他</SidebarGroupLabel>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href={`/user/${session?.userId}`}>
+                <LayoutGrid className='w-4 h-4' />
+                <span>ギャラリー</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href={`/user/${session?.userId}/recently-deleted`}>
