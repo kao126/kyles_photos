@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import { Sidebar, SidebarRail } from '@/components/ui/sidebar';
+import { Sidebar } from '@/components/ui/sidebar';
 import { AppSidebarHeader } from './header';
 import { AppSidebarContent } from './content';
 import { AppSidebarFooter } from './footer';
@@ -10,9 +10,12 @@ export async function AppSidebar() {
   return (
     <Sidebar>
       <AppSidebarHeader session={session} />
-      <AppSidebarContent session={session} />
-      <SidebarRail />
-      <AppSidebarFooter session={session} />
+      {session?.user && (
+        <>
+          <AppSidebarContent session={session} />
+          <AppSidebarFooter session={session} />
+        </>
+      )}
     </Sidebar>
   );
 }
