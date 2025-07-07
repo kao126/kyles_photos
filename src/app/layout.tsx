@@ -40,19 +40,23 @@ export default async function RootLayout({
             <SidebarProvider>
               <AppSidebar />
               <SidebarInset>
-                <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
-                  <div className='w-8'></div>
-                  <Link href='/' className='flex justify-center items-center gap-2 h-full'>
-                    <img src='/logo.png' alt='logo' className='size-8' />
-                    <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
-                  </Link>
-                  {session?.userId && <UploadButton userId={session?.userId} />}
-                </header>
+                {session?.user && (
+                  <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
+                    <div className='w-8'></div>
+                    <Link href='/' className='flex justify-center items-center gap-2 h-full'>
+                      <img src='/logo.png' alt='logo' className='size-8' />
+                      <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
+                    </Link>
+                    <UploadButton userId={session?.userId} />
+                  </header>
+                )}
                 <ProgressBar />
                 {children}
-                <footer className='md:hidden flex justify-center items-center h-16 border-t'>
-                  <small>{"Copyright © 2025 Kyle's Photos All Rights Reserved."}</small>
-                </footer>
+                {session?.user && (
+                  <footer className='md:hidden flex justify-center items-center h-16 border-t'>
+                    <small>{"Copyright © 2025 Kyle's Photos All Rights Reserved."}</small>
+                  </footer>
+                )}
               </SidebarInset>
               <Toaster />
             </SidebarProvider>

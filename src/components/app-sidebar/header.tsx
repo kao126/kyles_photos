@@ -16,9 +16,13 @@ export function AppSidebarHeader({ session }: { session: Session | null }) {
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
-      <SidebarMenu>
-        <SidebarMenuItem>{session?.userId && <AppSidebarButton userId={session.userId} />}</SidebarMenuItem>
-      </SidebarMenu>
+      {session?.userId && (
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <AppSidebarButton userId={session.userId} />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      )}
     </SidebarHeader>
   );
 }

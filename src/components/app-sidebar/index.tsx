@@ -8,14 +8,16 @@ export async function AppSidebar() {
   const session = await auth();
 
   return (
-    <Sidebar>
-      <AppSidebarHeader session={session} />
-      {session?.user && (
-        <>
-          <AppSidebarContent session={session} />
-          <AppSidebarFooter session={session} />
-        </>
-      )}
-    </Sidebar>
+    session && (
+      <Sidebar>
+        <AppSidebarHeader session={session} />
+        {session?.user && (
+          <>
+            <AppSidebarContent session={session} />
+            <AppSidebarFooter session={session} />
+          </>
+        )}
+      </Sidebar>
+    )
   );
 }
