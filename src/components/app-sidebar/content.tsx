@@ -43,7 +43,7 @@ export function AppSidebarContent({ session }: { session: Session }) {
 
   return (
     <SidebarContent>
-      {Object.keys(signedUrls).length > 0 && (
+      {Object.keys(signedUrls).length > 0 && pathname !== '/' && (
         <SidebarGroup className='group-data-[collapsible=icon]:hidden'>
           <SidebarGroupLabel>年月から探す</SidebarGroupLabel>
           <SidebarMenu>
