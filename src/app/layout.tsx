@@ -10,6 +10,7 @@ import { auth } from '@/auth';
 import { UploadButton } from '@/components/upload-button';
 import { FileUploadProvider } from '@/contexts/file-upload-context';
 import { ProgressBar } from '@/components/progress-bar';
+import { AppSidebarTrigger } from '@/components/app-sidebar/trigger';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,7 +43,7 @@ export default async function RootLayout({
               <SidebarInset>
                 {session?.user && (
                   <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
-                    <div className='w-8'></div>
+                    <AppSidebarTrigger />
                     <Link href='/' className='flex justify-center items-center gap-2 h-full'>
                       <img src='/logo.png' alt='logo' className='size-8' />
                       <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
