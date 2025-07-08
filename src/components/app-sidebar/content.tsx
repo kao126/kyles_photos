@@ -17,7 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronRight, Trash2, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 
-export function AppSidebarContent({ session }: { session: Session | null }) {
+export function AppSidebarContent({ session }: { session: Session }) {
   const router = useRouter();
   const pathname = usePathname();
   const isDeleted = pathname.endsWith('/recently-deleted');
@@ -25,7 +25,7 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
 
   useEffect(() => {
-    const url = isDeleted ? `/api/aws/s3?userId=${session?.userId}&isDeleted=true` : `/api/aws/s3?userId=${session?.userId}`;
+    const url = isDeleted ? `/api/aws/s3?userId=${session.userId}&isDeleted=true` : `/api/aws/s3?userId=${session.userId}`;
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -77,7 +77,7 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link href={`/user/${session?.userId}`}>
+              <Link href={`/user/${session.userId}`}>
                 <LayoutGrid className='w-4 h-4' />
                 <span>ギャラリー</span>
               </Link>
@@ -85,7 +85,7 @@ export function AppSidebarContent({ session }: { session: Session | null }) {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link href={`/user/${session?.userId}/recently-deleted`}>
+              <Link href={`/user/${session.userId}/recently-deleted`}>
                 <Trash2 className='w-4 h-4' />
                 <span>最近削除した項目</span>
               </Link>
