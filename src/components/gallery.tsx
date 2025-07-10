@@ -139,7 +139,9 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
             ))}
           </div>
         ))}
-        <div ref={loaderRef} className='h-10'></div>
+        <div ref={loaderRef} className='flex justify-center items-center'>
+          {isFetchingRef && isTruncated && <div className='w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin p-4'></div>}
+        </div>
       </div>
       {selectedFile && <FileDialogContent open={isOpen} setOpen={setIsOpen} selectedFile={selectedFile} isDeleted={isDeleted} />}
     </>
