@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const state = isDeleted ? 'recently-deleted' : 'active';
     const command = new ListObjectsV2Command({
       Bucket: bucket,
-      Prefix: `${userId}/${state}`,
+      Prefix: `${userId}/${state}/`,
       MaxKeys: 20,
       ContinuationToken: continuationToken || undefined,
     });

@@ -14,6 +14,7 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { uploaded } = useFileUpload();
   const loaderRef = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef<boolean>(false);
 
   useEffect(() => {
     const url = isDeleted ? `/api/aws/s3?userId=${userId}&isDeleted=true` : `/api/aws/s3?userId=${userId}`;
@@ -27,11 +28,13 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
   }, [uploaded]);
 
   useEffect(() => {
-    if (!loaderRef.current) return;
+    const target = loaderRef.current;
+    if (!target) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && isTruncated) {
+        if (entries[0].isIntersecting && isTruncated && !isFetchingRef.current) {
+          isFetchingRef.current = true;
           const encodedToken = encodeURIComponent(continuationToken ?? '');
           const url = isDeleted
             ? `/api/aws/s3?userId=${userId}&continuationToken=${encodedToken}&isDeleted=true`
@@ -68,16 +71,19 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
               });
               setContinuationToken(data.NextContinuationToken);
               setIsTruncated(data.IsTruncated);
+            })
+            .finally(() => {
+              isFetchingRef.current = false;
             });
         }
       },
       { threshold: 1.0 }
     );
 
-    observer.observe(loaderRef.current);
+    observer.observe(target);
 
     return () => observer.disconnect();
-  }, [loaderRef.current, isTruncated]);
+  }, [continuationToken, isTruncated]);
 
   function handleDialog({ year, month, file }: { year: string; month: string; file: MediaEntryType }) {
     setIsOpen((prev) => !prev);
@@ -128,12 +134,12 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
                       )}
                     </div>
                   ))}
-                  <div ref={loaderRef} className='h-10'></div>
                 </div>
               </div>
             ))}
           </div>
         ))}
+        <div ref={loaderRef} className='h-10'></div>
       </div>
       {selectedFile && <FileDialogContent open={isOpen} setOpen={setIsOpen} selectedFile={selectedFile} isDeleted={isDeleted} />}
     </>
