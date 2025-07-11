@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import { type Session } from 'next-auth';
 import { SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { AppSidebarButton } from './button';
 
-export function AppSidebarHeader({ session }: { session: Session | null }) {
+export function AppSidebarHeader() {
   return (
     <SidebarHeader>
       <SidebarMenu>
@@ -16,13 +15,11 @@ export function AppSidebarHeader({ session }: { session: Session | null }) {
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
-      {session?.userId && (
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <AppSidebarButton userId={session.userId} />
-          </SidebarMenuItem>
-        </SidebarMenu>
-      )}
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <AppSidebarButton />
+        </SidebarMenuItem>
+      </SidebarMenu>
     </SidebarHeader>
   );
 }

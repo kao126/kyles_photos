@@ -36,21 +36,19 @@ export default async function RootLayout({
   return (
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionProvider>
+        <SessionProvider session={session}>
           <FileUploadProvider>
             <SidebarProvider>
-              <AppSidebar />
+              {session && <AppSidebar />}
               <SidebarInset>
-                {session?.user && (
-                  <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
-                    <AppSidebarTrigger />
-                    <Link href='/' className='flex justify-center items-center gap-2 h-full'>
-                      <img src='/logo.png' alt='logo' className='size-8' />
-                      <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
-                    </Link>
-                    <UploadButton userId={session?.userId} />
-                  </header>
-                )}
+                <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
+                  <AppSidebarTrigger />
+                  <Link href='/' className='flex justify-center items-center gap-2 h-full'>
+                    <img src='/logo.png' alt='logo' className='size-8' />
+                    <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
+                  </Link>
+                  <UploadButton />
+                </header>
                 <ProgressBar />
                 {children}
                 {session?.user && (
