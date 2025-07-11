@@ -4,11 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { FileDialogContent } from './file-dialog';
 import { VideoThumbnail } from './video-thumbnail';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useFileUrlStore } from '@/lib/stores/file-url-store';
 import { usePathname } from 'next/navigation';
 
-  const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
-  const [continuationToken, setContinuationToken] = useState<string | null>(null);
-  const [isTruncated, setIsTruncated] = useState<boolean>(false);
 export function Gallery({ userId }: { userId: string; }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFileType>();
@@ -18,16 +16,10 @@ export function Gallery({ userId }: { userId: string; }) {
   const isFetchingRef = useRef<boolean>(false);
   const pathname = usePathname();
   const isRecentlyDeletedPage = pathname.endsWith('/recently-deleted');
+  const { signedUrls, nextContinuationToken, isTruncated, fetchFileUrls, updateFileUrls } = useFileUrlStore();
 
   useEffect(() => {
-    const url = isDeleted ? `/api/aws/s3?userId=${userId}&isDeleted=true` : `/api/aws/s3?userId=${userId}`;
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setSignedUrls(data.urls);
-        setContinuationToken(data.NextContinuationToken);
-        setIsTruncated(data.IsTruncated);
-      });
+    fetchFileUrls(userId, isRecentlyDeletedPage);
   }, [uploaded]);
 
   useEffect(() => {
@@ -37,47 +29,7 @@ export function Gallery({ userId }: { userId: string; }) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && isTruncated && !isFetchingRef.current) {
-          isFetchingRef.current = true;
-          const encodedToken = encodeURIComponent(continuationToken ?? '');
-          const url = isDeleted
-            ? `/api/aws/s3?userId=${userId}&continuationToken=${encodedToken}&isDeleted=true`
-            : `/api/aws/s3?userId=${userId}&continuationToken=${encodedToken}`;
-          fetch(url)
-            .then((res) => res.json())
-            .then((data) => {
-              const fileUrls = data.urls;
-              setSignedUrls((prev) => {
-                const newSignedUrls: fileUrlsType<MediaEntryType> = {};
-
-                // まず prev をコピー
-                for (const year in prev) {
-                  newSignedUrls[year] = {};
-                  for (const month in prev[year]) {
-                    newSignedUrls[year][month] = [...prev[year][month]];
-                  }
-                }
-
-                // fileUrls をマージ
-                for (const year in fileUrls) {
-                  if (!newSignedUrls[year]) newSignedUrls[year] = {};
-
-                  for (const month in fileUrls[year]) {
-                    if (!newSignedUrls[year][month]) {
-                      newSignedUrls[year][month] = [...fileUrls[year][month]];
-                    } else {
-                      newSignedUrls[year][month] = [...newSignedUrls[year][month], ...fileUrls[year][month]];
-                    }
-                  }
-                }
-
-                return newSignedUrls;
-              });
-              setContinuationToken(data.NextContinuationToken);
-              setIsTruncated(data.IsTruncated);
-            })
-            .finally(() => {
-              isFetchingRef.current = false;
-            });
+          updateFileUrls(isFetchingRef, userId, isRecentlyDeletedPage);
         }
       },
       { threshold: 1.0 }
@@ -86,7 +38,7 @@ export function Gallery({ userId }: { userId: string; }) {
     observer.observe(target);
 
     return () => observer.disconnect();
-  }, [continuationToken, isTruncated]);
+  }, [nextContinuationToken, isTruncated]);
 
   function handleDialog({ year, month, file }: { year: string; month: string; file: MediaEntryType }) {
     setIsOpen((prev) => !prev);

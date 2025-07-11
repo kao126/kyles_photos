@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { type Session } from 'next-auth';
 import {
@@ -16,21 +16,16 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronRight, Trash2, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
+import { useFileUrlStore } from '@/lib/stores/file-url-store';
 
 export function AppSidebarContent({ session }: { session: Session }) {
   const router = useRouter();
   const pathname = usePathname();
   const isRecentlyDeletedPage = pathname.endsWith('/recently-deleted');
-
-  const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
+  const { signedUrls, fetchFileUrls } = useFileUrlStore();
 
   useEffect(() => {
-    const url = isDeleted ? `/api/aws/s3?userId=${session.userId}&isDeleted=true` : `/api/aws/s3?userId=${session.userId}`;
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setSignedUrls(data.urls);
-      });
+    fetchFileUrls(session.userId, isRecentlyDeletedPage);
   }, [isRecentlyDeletedPage]);
 
   const scrollToTargetMonth = ({ year, month }: { year: string; month: string }) => {
