@@ -20,7 +20,7 @@ import Link from 'next/link';
 export function AppSidebarContent({ session }: { session: Session }) {
   const router = useRouter();
   const pathname = usePathname();
-  const isDeleted = pathname.endsWith('/recently-deleted');
+  const isRecentlyDeletedPage = pathname.endsWith('/recently-deleted');
 
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
 
@@ -31,7 +31,7 @@ export function AppSidebarContent({ session }: { session: Session }) {
       .then((data) => {
         setSignedUrls(data.urls);
       });
-  }, [isDeleted]);
+  }, [isRecentlyDeletedPage]);
 
   const scrollToTargetMonth = ({ year, month }: { year: string; month: string }) => {
     router.push(`${pathname}?year=${year}&month=${month}`, { scroll: false });

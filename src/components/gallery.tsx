@@ -4,17 +4,20 @@ import { useState, useEffect, useRef } from 'react';
 import { FileDialogContent } from './file-dialog';
 import { VideoThumbnail } from './video-thumbnail';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePathname } from 'next/navigation';
 
-export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: MediaEntryType['isDeleted'] }) {
   const [signedUrls, setSignedUrls] = useState<fileUrlsType>({});
   const [continuationToken, setContinuationToken] = useState<string | null>(null);
   const [isTruncated, setIsTruncated] = useState<boolean>(false);
+export function Gallery({ userId }: { userId: string; }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFileType>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { uploaded } = useFileUpload();
   const loaderRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef<boolean>(false);
+  const pathname = usePathname();
+  const isRecentlyDeletedPage = pathname.endsWith('/recently-deleted');
 
   useEffect(() => {
     const url = isDeleted ? `/api/aws/s3?userId=${userId}&isDeleted=true` : `/api/aws/s3?userId=${userId}`;
@@ -129,7 +132,7 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
                           />
                         </>
                       )}
-                      {isDeleted && (
+                      {isRecentlyDeletedPage && (
                         <div className='absolute bottom-0 text-center text-white w-full bg-gradient-to-t from-black/60 to-black/0'>{DaysLeft(file.lastModifiedDate)}日前</div>
                       )}
                     </div>
@@ -143,7 +146,7 @@ export function Gallery({ userId, isDeleted }: { userId: string; isDeleted: Medi
           {isFetchingRef && isTruncated && <div className='w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin p-4'></div>}
         </div>
       </div>
-      {selectedFile && <FileDialogContent open={isOpen} setOpen={setIsOpen} selectedFile={selectedFile} isDeleted={isDeleted} />}
+      {selectedFile && <FileDialogContent open={isOpen} setOpen={setIsOpen} selectedFile={selectedFile} isRecentlyDeletedPage={isRecentlyDeletedPage} />}
     </>
   );
 }

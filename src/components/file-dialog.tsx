@@ -8,12 +8,12 @@ export function FileDialogContent({
   open,
   setOpen,
   selectedFile,
-  isDeleted,
+  isRecentlyDeletedPage,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   selectedFile: SelectedFileType;
-  isDeleted: MediaEntryType['isDeleted'];
+  isRecentlyDeletedPage: boolean;
 }) {
   const { thumbnailUrl, setThumbnailUrl, generateThumbnail } = useGenerateThumbnailLogic();
 
@@ -42,7 +42,7 @@ export function FileDialogContent({
             {selectedFile.year}年{selectedFile.month}月{selectedFile.file.day}日
           </DialogTitle>
           <DialogDescription className='hidden'></DialogDescription>
-          <FileDropDown file={selectedFile.file} isDeleted={isDeleted} />
+          <FileDropDown file={selectedFile.file} isRecentlyDeletedPage={isRecentlyDeletedPage} />
         </DialogHeader>
         <div className='flex-1 flex justify-center items-center overflow-hidden pb-6 md:pb-12'>
           {selectedFile.file.fileMimeCategory === 'video' ? (

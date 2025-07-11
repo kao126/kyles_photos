@@ -10,5 +10,5 @@ export default async function Page({ params }: { params: Promise<{ userId: strin
     redirect('/');
   }
 
-  return <Gallery userId={session?.userId} isDeleted={true} />;
+  return <Gallery userId={session?.userId} />;
 }

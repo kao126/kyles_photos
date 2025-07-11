@@ -7,7 +7,7 @@ import { useDeleteFileLogic } from '@/hooks/use-delete-file';
 import { useDownloadFileLogic } from '@/hooks/use-download-file';
 import { AlertDialogComponent } from './alert-dialog';
 
-export function FileDropDown({ file, isDeleted }: { file: MediaEntryType; isDeleted: MediaEntryType['isDeleted'] }) {
+export function FileDropDown({ file, isRecentlyDeletedPage }: { file: MediaEntryType; isRecentlyDeletedPage: boolean }) {
   const { handleRecentlyDeletedFile } = useRecentlyDeletedFileLogic();
   const { handleRestoreFile } = useRestoreFileLogic();
   const { isOpen, setIsOpen, handleDeleteFile } = useDeleteFileLogic();
@@ -21,7 +21,7 @@ export function FileDropDown({ file, isDeleted }: { file: MediaEntryType; isDele
             <MoreVerticalIcon className='text-white' />
           </Button>
         </DropdownMenuTrigger>
-        {isDeleted ? (
+        {isRecentlyDeletedPage ? (
           <DropdownMenuContent className='rounded-sm'>
             <DropdownMenuItem className='hover:bg-gray-100' onClick={() => handleRestoreFile({ originalKey: file.key })}>
               復元
