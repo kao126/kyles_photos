@@ -1,5 +1,4 @@
 'use client';
-import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   SidebarContent,
@@ -22,12 +21,7 @@ export function AppSidebarContent() {
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
-  const isRecentlyDeletedPage = pathname.endsWith('/recently-deleted');
-  const { signedUrls, fetchFileUrls } = useFileUrlStore();
-
-  useEffect(() => {
-    session?.userId && fetchFileUrls(session.userId, isRecentlyDeletedPage);
-  }, [isRecentlyDeletedPage]);
+  const { signedUrls } = useFileUrlStore();
 
   const scrollToTargetMonth = ({ year, month }: { year: string; month: string }) => {
     router.push(`${pathname}?year=${year}&month=${month}`, { scroll: false });
