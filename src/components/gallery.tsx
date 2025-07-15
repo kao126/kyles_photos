@@ -77,7 +77,7 @@ export function Gallery({ userId }: { userId: string; }) {
                       ) : (
                         <div className='relative aspect-square'>
                           {isLoading && <Skeleton className='aspect-square' />}
-                          <Image src={file.url} alt={file.fileName} fill quality={50} onLoad={() => setIsLoading(false)} className='object-cover' />
+                          <Image src={file.url} alt={file.fileName} fill quality={1} onLoad={() => setIsLoading(false)} className='object-cover' />
                         </div>
                       )}
                       {isRecentlyDeletedPage && (
