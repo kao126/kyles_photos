@@ -6,6 +6,7 @@ import { VideoThumbnail } from './video-thumbnail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFileUrlStore } from '@/lib/stores/file-url-store';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 export function Gallery({ userId }: { userId: string; }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,15 +75,10 @@ export function Gallery({ userId }: { userId: string; }) {
                       {file.fileMimeCategory === 'video' ? (
                         <VideoThumbnail file={file} />
                       ) : (
-                        <>
-                          {isLoading && <Skeleton className='w-full aspect-square' />}
-                          <img
-                            src={file.url}
-                            alt={file.fileName}
-                            className={`w-full aspect-square object-cover ${isLoading ? 'hidden' : 'block'}`}
-                            onLoad={() => setIsLoading(false)}
-                          />
-                        </>
+                        <div className='relative aspect-square'>
+                          {isLoading && <Skeleton className='aspect-square' />}
+                          <Image src={file.url} alt={file.fileName} fill quality={50} onLoad={() => setIsLoading(false)} className='object-cover' />
+                        </div>
                       )}
                       {isRecentlyDeletedPage && (
                         <div className='absolute bottom-0 text-center text-white w-full bg-gradient-to-t from-black/60 to-black/0'>{DaysLeft(file.lastModifiedDate)}日前</div>

@@ -3,6 +3,7 @@ import { Dialog, DialogDescription, DialogHeader } from '@/components/ui/dialog'
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { FileDropDown } from './file-dropdown';
 import { useGenerateThumbnailLogic } from '@/hooks/use-generate-thumbnail';
+import Image from 'next/image';
 
 export function FileDialogContent({
   open,
@@ -48,7 +49,9 @@ export function FileDialogContent({
           {selectedFile.file.fileMimeCategory === 'video' ? (
             <video src={selectedFile.file.url} poster={thumbnailUrl} controls className='w-auto h-full object-contain' />
           ) : (
-            <img src={selectedFile.file.url} alt={selectedFile.file.fileName} className='w-auto h-full object-contain' />
+            <div className='relative w-full h-full'>
+              <Image src={selectedFile.file.url} alt={selectedFile.file.fileName} fill quality={50} className='object-contain' />
+            </div>
           )}
         </div>
       </DialogContent>
