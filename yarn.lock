@@ -286,6 +286,14 @@
     "@smithy/util-utf8" "^4.0.0"
     tslib "^2.6.2"
 
+"@aws-sdk/cloudfront-signer@^3.821.0":
+  version "3.821.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/cloudfront-signer/-/cloudfront-signer-3.821.0.tgz#4330a3f3970a483a5db6e86f00d8e7197733e3ee"
+  integrity sha512-5sDWEB23+eAzGklyjV1rYi4bSPWpG42N2+1WQhxF0491g5cElXwKN+eLgh/zT4Im3fq3Pum4Oj7P7SmMJLbATw==
+  dependencies:
+    "@smithy/url-parser" "^4.0.4"
+    tslib "^2.6.2"
+
 "@aws-sdk/core@3.816.0":
   version "3.816.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/core/-/core-3.816.0.tgz#f310a2fd458534b13f42de5e10fdfd3dfc8d4982"
