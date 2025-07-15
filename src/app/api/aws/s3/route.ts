@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { s3Client } from '@/lib/aws/s3';
-import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getHeadObject } from '@/actions/aws/s3';
 import { getMimeCategory } from '@/lib/mime-category';
+import { getCloudFrontSignedUrl } from '@/actions/aws/cloud-front';
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId');
@@ -31,11 +31,6 @@ export async function GET(req: NextRequest) {
     const urls: fileUrlsType<MediaEntryType> = {};
 
     for (const key of keys) {
-      const getCommand = new GetObjectCommand({
-        Bucket: bucket,
-        Key: key,
-      });
-
       // fileMimeを取得
       const head = await getHeadObject(bucket, key);
       const fileMime = head.ContentType || '';
@@ -54,7 +49,7 @@ export async function GET(req: NextRequest) {
       const day = date.getDate().toString();
 
       // 署名付きURLを生成（1時間有効）
-      const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
+      const url = getCloudFrontSignedUrl(key);
 
       if (!urls[year]) {
         urls[year] = {};

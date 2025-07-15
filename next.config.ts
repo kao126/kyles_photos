@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: `${process.env.S3_BUCKET_NAME}.s3.ap-northeast-1.amazonaws.com`,
+        hostname: process.env.CLOUDFRONT_DOMAIN!,
         pathname: '**', // 任意の画像パスを許可
       },
     ],
