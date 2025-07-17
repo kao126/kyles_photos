@@ -41,15 +41,17 @@ export default async function RootLayout({
             <SidebarProvider>
               {session && <AppSidebar />}
               <SidebarInset>
-                <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
-                  <AppSidebarTrigger />
-                  <Link href='/' className='flex justify-center items-center gap-2 h-full'>
-                    <img src='/logo.png' alt='logo' className='size-8' />
-                    <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
-                  </Link>
-                  <UploadButton />
-                </header>
-                <ProgressBar />
+                {session && (
+                  <header className='md:hidden flex justify-between items-center h-16 border-b sticky top-0 bg-background z-50 px-6'>
+                    <AppSidebarTrigger />
+                    <Link href='/' className='flex justify-center items-center gap-2 h-full'>
+                      <img src='/logo.png' alt='logo' className='size-8' />
+                      <span className='text-base font-semibold'>{"Kyle's Photos"}</span>
+                    </Link>
+                    <UploadButton />
+                  </header>
+                )}
+                {session && <ProgressBar />}
                 {children}
                 {session?.user && (
                   <footer className='md:hidden flex justify-center items-center h-16 border-t'>
