@@ -35,5 +35,5 @@ export default auth(async function middleware(req) {
 
 // ミドルウェアの適用範囲
 export const config = {
-  matcher: ['/((?!api|_next|favicon.ico).*)'],
+  matcher: ['/((?!api|_next|favicon.ico|.*\\.[^/]+$).*)'],
 };
