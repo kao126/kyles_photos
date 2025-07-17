@@ -19,8 +19,8 @@ export default auth(async function middleware(req) {
     return new NextResponse('Access Denied: Invalid device', { status: 401 });
   }
 
-  // auth認証（ログインページは除く）
-  if (!req.auth && pathname !== '/login') {
+  // auth認証（トップ,ログインページは除く）
+  if (!req.auth && pathname !== '/' && pathname !== '/login') {
     return NextResponse.redirect(new URL('/login', origin));
   }
 
