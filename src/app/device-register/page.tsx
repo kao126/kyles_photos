@@ -25,7 +25,7 @@ export default function DeviceRegister() {
         <Card className='text-center'>
           <CardHeader>
             <CardTitle className='text-xl'>Device Registration</CardTitle>
-            <CardDescription>Enter "Device Token" and register the token</CardDescription>
+            <CardDescription>Enter {'"Device Token"'} and register the token</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
